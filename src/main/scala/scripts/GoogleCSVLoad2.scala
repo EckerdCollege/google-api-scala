@@ -314,10 +314,10 @@ object  GoogleCSVLoad2 extends App {
     googleStringer(googleIdentity).map(a => (googleIdentity.primaryEmail, a))
   }
 
-  val idents = ReturnGoogleIdentities(fileName)
-  val future = Future.sequence(idents.map(GOBUMAPInsertUpdate(_)))
+  val idents = ReturnGoogleIdentities(fileName) // The Identities From The Spreadsheet
+  val future = Future.sequence(idents.map(GOBUMAPInsertUpdate(_))) // The Actual Database Transactions Grouped
 
-  val ints = Await.result(future, Duration.Inf)
-  ints.filter(a => a._2 != 0 ).foreach(println(_))
+  val ints = Await.result(future, Duration(60, "seconds")) // Waiting for all futures to complete 60s timeout
+  ints.filter(a => a._2 != 0 ).foreach(println(_)) // Print Out Any Values Updated Or Inserted
 
 }
