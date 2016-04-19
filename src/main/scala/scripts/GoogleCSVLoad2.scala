@@ -53,93 +53,6 @@ object  GoogleCSVLoad2 extends App {
     */
   def GOBUMAPInsertUpdate(googleIdentity: GoogleIdentity): Future[(String,Int)] = {
 
-    /**
-      * Function checks GOREMAL for the email associated with the Google Identity and if it is the highest email type
-      * associated with
-      *
-      * @param googleIdentity A Google Identity
-      * @return Option of a PIDM
-      */
-    def GoremalPidmFind(googleIdentity: GoogleIdentity): Future[Option[Int]] = {
-
-      /**
-        * This function finds a matching record in GOREMAL to the googleidentities email and where it is in a set
-        * type of codes
-        *
-        * @param googleIdentity Take a Google Idendtity
-        * @param emaltype       This is a filter for valid EMAL Codes
-        * @return An Option of A GOREMAL_R
-        */
-      def goremalrecmatch(googleIdentity: GoogleIdentity, emaltype: List[String]): Future[Option[GOREMAL_R]] = {
-        val goremalpidm = modules.goremalDal.findByFilter(v =>
-          v.email === googleIdentity.primaryEmail
-        ).map(rec => rec.filter(a => emaltype.contains(a.emal_code))
-        ).map(rec => rec.headOption)
-
-        goremalpidm
-      }
-
-      /**
-        *
-        * This takes a record and sees if it is the best record. Of the record types the priority is alphabetical which
-        * allows use to sortwith less than.
-        *
-        * @param gor      Option of a GOREMAL Record
-        * @param emaltype A List to filter for valid EMAL Codes
-        * @return
-        */
-      def bestrecfind(gor: Option[GOREMAL_R], emaltype: List[String]): Future[Option[GOREMAL_R]] = gor match {
-        case None => Future(None)
-        case Some(rec) =>
-
-          val futureIsBestEmail = modules.goremalDal.findByFilter(
-            record =>
-              record.pidm === rec.pidm
-          ).map(rec =>
-            rec.filter(a => emaltype.contains(a.emal_code))
-          ).map(
-            gor => gor.sortWith(_.emal_code < _.emal_code)
-          ).map(
-            recs => recs.headOption
-          )
-          futureIsBestEmail
-      }
-
-
-      /**
-        * This function filters the goremal record to efficiently run through whether the record returned anything,
-        * and if it returned see if it is the best record. If it is the best record, we use that otherwise we
-        * return None
-        *
-        * @param goremalrec Option of a Goremal record
-        * @param emaltype   emaltypes to filter results
-        * @return Option of a PIDM. Returns PIDM if the Record Exists and it is the Best Record
-        */
-      def selectreturntype(goremalrec: Option[GOREMAL_R], emaltype: List[String]):
-      Future[Option[Int]] = goremalrec match {
-
-        case None => Future(None)
-        case Some(s) =>
-
-          val bestrec = bestrecfind(goremalrec, emaltype)
-
-          bestrec.map( best =>
-            if (best == goremalrec) {
-              Some(s.pidm)
-            }
-            else {
-              None
-            }
-          )
-      }
-
-
-      val emaltypes = List("CA", "CAS", "ECA", "ZCA", "ZCAS", "ZCH")
-      val goremalrec = goremalrecmatch(googleIdentity, emaltypes)
-
-      goremalrec.flatMap(value => selectreturntype(value, emaltypes))
-    }
-
 
     /**
       * This is the future wrangler. The other pieces return futures so we need to handle the futures to our integer
@@ -149,6 +62,94 @@ object  GoogleCSVLoad2 extends App {
       * @return An integer showing as 1 if information was updated, or the PIDM if they were inserted.
       */
     def googleStringer(googleIdentity: GoogleIdentity): Future[Int] = {
+
+
+      /**
+        * Function checks GOREMAL for the email associated with the Google Identity and if it is the highest email type
+        * associated with
+        *
+        * @param googleIdentity A Google Identity
+        * @return Option of a PIDM
+        */
+      def GoremalPidmFind(googleIdentity: GoogleIdentity): Future[Option[Int]] = {
+
+        /**
+          * This function finds a matching record in GOREMAL to the googleidentities email and where it is in a set
+          * type of codes
+          *
+          * @param googleIdentity Take a Google Idendtity
+          * @param emaltype       This is a filter for valid EMAL Codes
+          * @return An Option of A GOREMAL_R
+          */
+        def goremalrecmatch(googleIdentity: GoogleIdentity, emaltype: List[String]): Future[Option[GOREMAL_R]] = {
+          val goremalpidm = modules.goremalDal.findByFilter(v =>
+            v.email === googleIdentity.primaryEmail
+          ).map(rec => rec.filter(a => emaltype.contains(a.emal_code))
+          ).map(rec => rec.headOption)
+
+          goremalpidm
+        }
+
+        /**
+          *
+          * This takes a record and sees if it is the best record. Of the record types the priority is alphabetical
+          * which allows use to sortwith less than.
+          *
+          * @param gor      Option of a GOREMAL Record
+          * @param emaltype A List to filter for valid EMAL Codes
+          * @return
+          */
+        def bestrecfind(gor: Option[GOREMAL_R], emaltype: List[String]): Future[Option[GOREMAL_R]] = gor match {
+          case None => Future(None)
+          case Some(rec) =>
+
+            val futureIsBestEmail = modules.goremalDal.findByFilter(
+              record =>
+                record.pidm === rec.pidm
+            ).map(rec =>
+              rec.filter(a => emaltype.contains(a.emal_code))
+            ).map(
+              gor => gor.sortWith(_.emal_code < _.emal_code)
+            ).map(
+              recs => recs.headOption
+            )
+            futureIsBestEmail
+        }
+
+
+        /**
+          * This function filters the goremal record to efficiently run through whether the record returned anything,
+          * and if it returned see if it is the best record. If it is the best record, we use that otherwise we
+          * return None
+          *
+          * @param goremalrec Option of a Goremal record
+          * @param emaltype   emaltypes to filter results
+          * @return Option of a PIDM. Returns PIDM if the Record Exists and it is the Best Record
+          */
+        def selectreturntype(goremalrec: Option[GOREMAL_R], emaltype: List[String]):
+        Future[Option[Int]] = goremalrec match {
+
+          case None => Future(None)
+          case Some(s) =>
+
+            val bestrec = bestrecfind(goremalrec, emaltype)
+
+            bestrec.map( best =>
+              if (best == goremalrec) {
+                Some(s.pidm)
+              }
+              else {
+                None
+              }
+            )
+        }
+
+
+        val emaltypes = List("CA", "CAS", "ECA", "ZCA", "ZCAS", "ZCH")
+        val goremalrec = goremalrecmatch(googleIdentity, emaltypes)
+
+        goremalrec.flatMap(value => selectreturntype(value, emaltypes))
+      }
 
 
       /**
@@ -232,7 +233,8 @@ object  GoogleCSVLoad2 extends App {
         * @return A tuple that contains all of the values from the previous futures serving as a merging point of
         *         the future threads.
         */
-      def FutureBoolTupletoFinalTuple(futureBoolTuple:Future[(Boolean, Boolean)], futurePidm: Future[Int]): Future[(Boolean, Boolean, Int)] = {
+      def FutureBoolTupletoFinalTuple(futureBoolTuple:Future[(Boolean, Boolean)], futurePidm: Future[Int]):
+      Future[(Boolean, Boolean, Int)] = {
         for {
           pid <- futurePidm
           boolTuple <- futureBoolTuple
