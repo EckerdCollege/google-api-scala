@@ -4,22 +4,22 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
-
 import com.google.api.services.admin.directory.model.{User, Users}
 import collection.JavaConverters._
 import scala.annotation.tailrec
 import persistence.entities.representations.GoogleIdentity
-
-
-
-
-
 
 /**
   * Created by davenpcm on 4/19/2016.
   */
 object GoogleAdmin{
 
+  /**
+    * This function is currently configured for a service account to interface with the school. It has been granted
+    * explicitly this single grant so to change the scope these need to be implemented in Google first.
+    *
+    * @return A Google Directory Object which can be used to look through users with current permissions
+    */
   private def getDirectoryService: Directory = {
     import java.util._
 
@@ -54,6 +54,16 @@ object GoogleAdmin{
     directory
   }
 
+  /**
+    * This is a simple user accumulation function that collects all users in eckerd. It does no additional modification
+    * so that you can easily move from users to whatever other form you would like and do those pieces of data
+    * manipulation after all the users have been returned.
+    *
+    * @param service A directory to check
+    * @param pageToken A page token which indicates where you are in the sequence of pages of users
+    * @param users A List Used For Recursive Accumulation through the function. We build a large list of users
+    * @return
+    */
   @tailrec
   private def listAllUsers(service: Directory, pageToken: String = "", users: List[Users] = List[Users]()): List[Users] = {
 
@@ -73,9 +83,23 @@ object GoogleAdmin{
 
   }
 
+  /**
+    * This function is a Type free implementation that allows you to tell you what type you are expecting as a return
+    * and it will fully type check that you are getting the type you want back.
+    *
+    * @param service This is the directory to be returned
+    * @param pageToken This is a page token to show where in the series of pages you are.
+    * @param transformed A List of Type T, is Initialized to an Empty List that is expanded recursively through each
+    *                    of the pages
+    * @param f This is a transformation function that takes a User and Transforms it to Type T
+    * @tparam T This is any type that you want to return from the google users.
+    * @return Returns a List of Type T
+    */
   @tailrec
-  private def pageAllGoogleUsers[T](service: Directory, pageToken: String = "", transformed: List[T] = List[T]())(f: Users => T):
-  scala.List[T] = {
+  private def transformAllGoogleUsers[T](service: Directory,
+                                    pageToken: String = "",
+                                    transformed: List[T] = List[T]()
+                                   )(f: User => T): List[T] = {
 
     val result = service.users()
       .list()
@@ -85,30 +109,39 @@ object GoogleAdmin{
       .setPageToken(pageToken)
       .execute()
 
-    val list: scala.List[T] = f(result) :: transformed
+    val typedList = List[Users](result)
+      .map(users => users.getUsers.asScala.toList)
+      .foldLeft(List[User]())((acc, listUsers) => listUsers ::: acc)
+      .map(user => f(user))
+
+    val list: List[T] = typedList ::: transformed
 
     val nextPageToken = result.getNextPageToken
 
-    if (nextPageToken != null && result.getUsers != null) pageAllGoogleUsers(service, nextPageToken, list)(f) else list
+    if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(service, nextPageToken, list)(f) else list
   }
 
 
-  private def UsersToGoogleIdents(users: Users): scala.List[GoogleIdentity] = {
-    val list : List[Users] = List[Users](users)
 
-    val googleIdentList = list.map(users => users.getUsers.asScala.toList)
-      .foldLeft(List[User]())((acc, listUsers) => listUsers ::: acc)
-      .map(user => GoogleIdentity(user.getId, user.getPrimaryEmail))
+  /**
+    * Returns a List of Google Identities for Eckerd College
+    * @return List of GoogleIdentity
+    */
+  def ReturnAllGoogleIdentities(): List[GoogleIdentity] = {
 
-    googleIdentList
-  }
-
-  def ReturnAllGoogleIdentities(): scala.List[GoogleIdentity] = {
+    /**
+      * Simple Transformation between the Google User Objects ID and Primary Email and a GoogleIdentity Case Class
+      * @param user Google User Object
+      * @return A GoogleIdentity
+      */
+    def UserToGoogleIdent(user: User): GoogleIdentity = {
+      GoogleIdentity(user.getId, user.getPrimaryEmail)
+    }
 
     val service = getDirectoryService
-    val googleIdentitiesSets = pageAllGoogleUsers[List[GoogleIdentity]](service)(UsersToGoogleIdents)
-    val googleIdentities = googleIdentitiesSets.foldLeft(List[GoogleIdentity]())((acc, listSeqs) => listSeqs ::: acc)
-    googleIdentities
+    val googleIdentitiesSets = transformAllGoogleUsers[GoogleIdentity](service)(UserToGoogleIdent)
+
+    googleIdentitiesSets
   }
 
 }
