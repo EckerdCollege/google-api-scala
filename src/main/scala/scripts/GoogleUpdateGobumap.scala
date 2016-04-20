@@ -13,36 +13,12 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by davenpcm on 4/15/2016.
   */
-object  GoogleCSVLoad2 extends App {
+object GoogleUpdateGobumap extends App {
 
   val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
   import modules.dbConfig.driver.api._
 
-  val fileName = "C:/Users/davenpcm/Downloads/gam-id-email.csv"
 
-  /**
-    * CSV Parse For Creating The Google Identity
-    *
-    * @param path This is a path to find the csv that will be parsed
-    * @return A Set of Google Identities That Can Continue through the process
-    */
-  def ReturnGoogleIdentities(path: String): Seq[GoogleIdentity] = {
-
-    def identsCreate(path: String): Seq[GoogleIdentity] =  {
-      val bufferedSource = io.Source.fromFile(path)
-      var Idents: Seq[GoogleIdentity] = Seq[GoogleIdentity]()
-      for (line <- bufferedSource.getLines) {
-        val cols = line.split(",").map(_.trim)
-        Idents = Idents :+ GoogleIdentity(cols(0), cols(1))
-      }
-      bufferedSource.close()
-      Idents
-    }
-
-    val idents = identsCreate(path)
-
-    idents.drop(1)
-  }
 
   /**
     * This is the Insert or Update Function takes the google identity to do all operations necessary for updating the
@@ -314,7 +290,8 @@ object  GoogleCSVLoad2 extends App {
     googleStringer(googleIdentity).map(a => (googleIdentity.primaryEmail, a))
   }
 
-  val idents = ReturnGoogleIdentities(fileName) // The Identities From The Spreadsheet
+//  val idents = ReturnGoogleIdentities(fileName) // The Identities From The Spreadsheet
+  val idents = GoogleAdmin.ReturnAllGoogleIdentities()
   val future = Future.sequence(idents.map(GOBUMAPInsertUpdate(_))) // The Actual Database Transactions Grouped
 
   val ints = Await.result(future, Duration(60, "seconds")) // Waiting for all futures to complete 60s timeout
