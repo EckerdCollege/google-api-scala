@@ -1,6 +1,7 @@
 package scripts
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
@@ -9,6 +10,8 @@ import com.google.api.services.admin.directory.model._
 import collection.JavaConverters._
 import scala.annotation.tailrec
 import persistence.entities.representations.GoogleIdentity
+
+import scala.util.{Try, Success, Failure}
 
 
 /**
@@ -124,25 +127,33 @@ object GoogleAdmin{
                           members: List[Member] = List[Member]()
                           ): List[Member] = {
 
-    val result = service.members()
+    val resultTry = Try(
+      service.members()
       .list(groupKey)
       .setMaxResults(500)
       .setPageToken(pageToken)
       .execute()
+    )
 
+    resultTry match {
+      case Success(result) =>
+        val typedList = List[Members](result)
+          .map(members => Option(members.getMembers))
+          .map{ case Some(member) => member.asScala.toList case None => List[Member]() }
+          .foldLeft(List[Member]())((acc, listMembers) => listMembers ::: acc)
 
-    val typedList = List[Members](result)
-        .map(members => Option(members.getMembers))
-        .map{ case Some(member) => member.asScala.toList case None => List[Member]() }
-        .foldLeft(List[Member]())((acc, listMembers) => listMembers ::: acc)
+        val list = typedList ::: members
 
-    val list = typedList ::: members
+        val nextPageToken = result.getNextPageToken
 
-    val nextPageToken = result.getNextPageToken
+        if (nextPageToken != null && result.getMembers != null) listAllGroupMembers(groupKey, service, nextPageToken, list) else list
 
-    if (nextPageToken != null && result.getMembers != null) listAllGroupMembers(groupKey, service, nextPageToken, list) else list
+      case Failure(exception: GoogleJsonResponseException) => listAllGroupMembers(groupKey, service, pageToken, members)
+      case Failure(e) => throw e
+    }
 
   }
+
 
 
   /**
