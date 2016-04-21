@@ -21,9 +21,10 @@ object GoogleAdmin{
 
   /**
     * This function is currently configured for a service account to interface with the school. It has been granted
-    * explicitly this single grant so to change the scope these need to be implemented in Google first.
+    * explicitly these grants so to change the scope these need to be implemented in Google first.
     *
-    * @return A Google Directory Object which can be used to look through users with current permissions
+    * @param DirectoryScope This is the scope that is requested for whatever operations you would like to perform.
+    * @return A Google Directory Object which can be used to look through Admin Directory Information
     */
   private def getDirectoryService(DirectoryScope:String): Directory = {
     import java.util._
@@ -95,6 +96,15 @@ object GoogleAdmin{
 
   }
 
+  /**
+    * This function simply returns a list of all groups in the organization.
+    *
+    * @param service The Directory Service We Are Getting the Groups From
+    * @param pageToken The Page Token for the current page. We Initialize As An Empty String and automatically fill it
+    *                  out as we move through the pages
+    * @param groups This is the growing list of groups that is recursively passed through the function
+    * @return A list of all groups.
+    */
   @tailrec
   def listAllGroups(service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP),
                     pageToken: String = "",
@@ -120,6 +130,19 @@ object GoogleAdmin{
 
   }
 
+  /**
+    * The function takes a groupKey to return all members of the group. Current Error Handling will terminate on an error
+    * from our side, but will retry if it is a bad return response from google, likely a service unavailable. Which
+    * occurs sporadically. 
+    *
+    * @param groupKey This is either the unique group id or the group email address. Which specifies which group to
+    *                 return the members of
+    * @param service This is the service we will be utilizing to get the members. It is initialized as a Parameter as
+    *                that way it is only initialized on entry to the loop and then the same directory is used each time
+    * @param pageToken This is the page token that shows where we are in the pages.
+    * @param members This is the growing list of group members
+    * @return A list of all members of the group
+    */
   @tailrec
   def listAllGroupMembers(groupKey: String,
                           service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP),
@@ -153,8 +176,6 @@ object GoogleAdmin{
     }
 
   }
-
-
 
   /**
     * This function is a Type free implementation that allows you to tell you what type you are expecting as a return
@@ -216,9 +237,4 @@ object GoogleAdmin{
 
     googleIdentitiesSets
   }
-
-  val groupScope = DirectoryScopes.ADMIN_DIRECTORY_GROUP
-  val groupMemberScope = DirectoryScopes.ADMIN_DIRECTORY_GROUP_MEMBER
-
-
 }
