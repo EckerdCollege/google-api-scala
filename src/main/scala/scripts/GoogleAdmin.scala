@@ -4,10 +4,12 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
-import com.google.api.services.admin.directory.model.{User, Users}
+import com.google.api.services.admin.directory.model._
+
 import collection.JavaConverters._
 import scala.annotation.tailrec
 import persistence.entities.representations.GoogleIdentity
+
 
 /**
   * Created by davenpcm on 4/19/2016.
@@ -20,7 +22,7 @@ object GoogleAdmin{
     *
     * @return A Google Directory Object which can be used to look through users with current permissions
     */
-  private def getDirectoryService: Directory = {
+  private def getDirectoryService(DirectoryScope:String): Directory = {
     import java.util._
 
     val SERVICE_ACCOUNT_EMAIL = "wso2-admin2@ellucian-identity-service-1282.iam.gserviceaccount.com"
@@ -35,7 +37,7 @@ object GoogleAdmin{
       .setTransport( httpTransport)
       .setJsonFactory(jsonFactory)
       .setServiceAccountId(SERVICE_ACCOUNT_EMAIL)
-      .setServiceAccountScopes( Collections.singleton( DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY ) )
+      .setServiceAccountScopes( Collections.singleton( DirectoryScope ) )
       .setServiceAccountPrivateKeyFromP12File(
         new java.io.File(SERVICE_ACCOUNT_PKCS12_FILE_PATH)
       )
@@ -65,7 +67,9 @@ object GoogleAdmin{
     * @return
     */
   @tailrec
-  private def listAllUsers(service: Directory, pageToken: String = "", users: List[Users] = List[Users]()): List[Users] = {
+  def listAllUsers(service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_USER),
+                   pageToken: String = "",
+                   users: List[User] = List[User]()): List[User] = {
 
     val result = service.users()
       .list()
@@ -75,13 +79,71 @@ object GoogleAdmin{
       .setPageToken(pageToken)
       .execute()
 
-    val list = result :: users
+    val typedList = List[Users](result)
+      .map(users => Option(users.getUsers))
+      .map{ case Some(javaList) => javaList.asScala.toList case None => List[User]()}
+      .foldLeft(List[User]())((acc, listUsers) => listUsers ::: acc)
+
+    val list = typedList ::: users
 
 
     val nextPageToken = result.getNextPageToken
     if (nextPageToken != null && result.getUsers != null) listAllUsers(service, nextPageToken, list) else list
 
   }
+
+  @tailrec
+  def listAllGroups(service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP),
+                    pageToken: String = "",
+                    groups: List[Group] = List[Group]()
+                   ): List[Group] ={
+
+    val result = service.groups()
+      .list()
+      .setDomain("eckerd.edu")
+      .setMaxResults(500)
+      .setPageToken(pageToken)
+      .execute()
+
+    val typedList = List[Groups](result)
+      .map(groups => groups.getGroups.asScala.toList)
+      .foldLeft(List[Group]())((acc, listGroups) => listGroups ::: acc)
+
+    val list = typedList ::: groups
+
+    val nextPageToken = result.getNextPageToken
+
+    if (nextPageToken != null && result.getGroups != null) listAllGroups(service, nextPageToken, list) else list
+
+  }
+
+  @tailrec
+  def listAllGroupMembers(groupKey: String,
+                          service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP),
+                          pageToken: String = "",
+                          members: List[Member] = List[Member]()
+                          ): List[Member] = {
+
+    val result = service.members()
+      .list(groupKey)
+      .setMaxResults(500)
+      .setPageToken(pageToken)
+      .execute()
+
+
+    val typedList = List[Members](result)
+        .map(members => Option(members.getMembers))
+        .map{ case Some(member) => member.asScala.toList case None => List[Member]() }
+        .foldLeft(List[Member]())((acc, listMembers) => listMembers ::: acc)
+
+    val list = typedList ::: members
+
+    val nextPageToken = result.getNextPageToken
+
+    if (nextPageToken != null && result.getMembers != null) listAllGroupMembers(groupKey, service, nextPageToken, list) else list
+
+  }
+
 
   /**
     * This function is a Type free implementation that allows you to tell you what type you are expecting as a return
@@ -96,9 +158,9 @@ object GoogleAdmin{
     * @return Returns a List of Type T
     */
   @tailrec
-  private def transformAllGoogleUsers[T](service: Directory,
+  private def transformAllGoogleUsers[T](service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_USER),
                                     pageToken: String = "",
-                                    transformed: List[T] = List[T]()
+                                    transformed: => List[T] = List[T]()
                                    )(f: User => T): List[T] = {
 
     val result = service.users()
@@ -109,12 +171,13 @@ object GoogleAdmin{
       .setPageToken(pageToken)
       .execute()
 
-    val typedList = List[Users](result)
-      .map(users => users.getUsers.asScala.toList)
+    lazy val typedList = List[Users](result)
+      .map(users => Option(users.getUsers))
+      .map{ case Some(javaList) => javaList.asScala.toList case None => List[User]()}
       .foldLeft(List[User]())((acc, listUsers) => listUsers ::: acc)
       .map(user => f(user))
 
-    val list: List[T] = typedList ::: transformed
+    lazy val list: List[T] = typedList ::: transformed
 
     val nextPageToken = result.getNextPageToken
 
@@ -138,10 +201,13 @@ object GoogleAdmin{
       GoogleIdentity(user.getId, user.getPrimaryEmail)
     }
 
-    val service = getDirectoryService
-    val googleIdentitiesSets = transformAllGoogleUsers[GoogleIdentity](service)(UserToGoogleIdent)
+    val googleIdentitiesSets = transformAllGoogleUsers[GoogleIdentity]()(UserToGoogleIdent)
 
     googleIdentitiesSets
   }
+
+  val groupScope = DirectoryScopes.ADMIN_DIRECTORY_GROUP
+  val groupMemberScope = DirectoryScopes.ADMIN_DIRECTORY_GROUP_MEMBER
+
 
 }
