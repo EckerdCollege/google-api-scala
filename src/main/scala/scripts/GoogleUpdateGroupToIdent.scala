@@ -17,21 +17,24 @@ object GoogleUpdateGroupToIdent extends App {
   val db = modules.db
 
   case class GroupIdent(id: String, name: String, email: String, count: Long, desc: String)
-  case class Group2Ident(groupId: String, identID: String)
+  case class Group2Ident(
+                          groupId: String,
+                          identID: String,
+                          memberRole: String,
+                          memberType: String
+                        )
 
   class GROUPTOIDENT(tag: Tag) extends Table[Group2Ident](tag, "GROUP_TO_IDENT") {
     def groupId = column[String]("GROUP_ID")
-
     def identID = column[String]("IDENT_ID")
+    def memberRole = column[String]("MEMBER_ROLE")
+    def memberType = column[String]("MEMBER_TYPE")
 
-    def * = (groupId, identID) <> (Group2Ident.tupled, Group2Ident.unapply )
+    def * = (groupId, identID, memberRole, memberType) <> (Group2Ident.tupled, Group2Ident.unapply )
   }
-
-  def buildTable(): Unit = {
-    Await.result(db.run( group2IdentTableQuery.schema.create), Duration.Inf)
-  }
-
+  
   val group2IdentTableQuery = TableQuery[GROUPTOIDENT]
+  Await.result(db.run( group2IdentTableQuery.schema.create), Duration.Inf)
 
   val groups = listAllGroups()
 
@@ -39,7 +42,7 @@ object GoogleUpdateGroupToIdent extends App {
     GroupIdent( group.getId, group.getName, group.getEmail, group.getDirectMembersCount, group.getDescription)
   )
 
-  val group2Members = groupidents.map(ident => listAllGroupMembers(ident.email).map(member => Group2Ident(ident.id, member.getId)))
+  val group2Members = groupidents.map(ident => listAllGroupMembers(ident.email).map(member => Group2Ident(ident.id, member.getId, member.getRole, member.getType)))
     .foldLeft(List[Group2Ident]())((acc, next) => next ::: acc)
 
 //  val group2Members = List(Group2Ident("test", "test"))
