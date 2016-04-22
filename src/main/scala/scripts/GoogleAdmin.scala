@@ -237,4 +237,14 @@ object GoogleAdmin{
 
     googleIdentitiesSets
   }
+
+  def AddUserToGroup(groupKey: String, id: String, service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP)) = {
+    val newMember = new Member
+    newMember.setId(id)
+    newMember.setRole("MEMBER")
+
+    val returnType = service.members().insert(groupKey, newMember).execute()
+    returnType
+  }
+
 }
