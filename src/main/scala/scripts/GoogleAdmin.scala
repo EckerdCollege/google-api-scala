@@ -51,9 +51,9 @@ object GoogleAdmin{
       .setServiceAccountUser(USER_EMAIL)
       .build()
 
-    if (!credential.refreshToken()) {
-      throw new RuntimeException("Failed OAuth to refresh the token")
-    }
+//    if (!credential.refreshToken()) {
+//      throw new RuntimeException("Failed OAuth to refresh the token")
+//    }
 
     val directory = new Directory.Builder(httpTransport, jsonFactory, credential)
       .setApplicationName(APPLICATION_NAME)
@@ -248,6 +248,15 @@ object GoogleAdmin{
 
     val returnType = service.members().insert(groupKey, newMember).execute()
     returnType
+  }
+
+  def GetUserPhoto(userKey: String, service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_USER)): Option[UserPhoto] = {
+    val returnType = Try( service.users().photos().get(userKey).execute() )
+
+    returnType match {
+      case Success(value) => Some(value)
+      case Failure(exception) => None
+    }
   }
 
 }
