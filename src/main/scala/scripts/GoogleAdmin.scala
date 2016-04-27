@@ -30,7 +30,7 @@ object GoogleAdmin{
     import java.util._
 
     val SERVICE_ACCOUNT_EMAIL = "wso2-admin2@ellucian-identity-service-1282.iam.gserviceaccount.com"
-    val SERVICE_ACCOUNT_PKCS12_FILE_PATH = "C:/Users/davenpcm/Downloads/Ellucian Identity Service-8c565b08687e.p12"
+    val SERVICE_ACCOUNT_PKCS12_FILE_PATH = "/home/davenpcm/Downloads/Ellucian Identity Service-8c565b08687e.p12"
     val APPLICATION_NAME = "Ellucian Identity Service"
     val USER_EMAIL = "wso_admin@eckerd.edu"
 
