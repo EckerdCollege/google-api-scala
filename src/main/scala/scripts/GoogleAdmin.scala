@@ -310,7 +310,7 @@ object GoogleAdmin{
     }
   }
 
-  def GetCalendarEvents(userEmail: String) = {
+  def GetCalendarEvents(userEmail: String): List[Event] = {
     val now = new DateTime(System.currentTimeMillis())
     val service = getCalendarService(CalendarScopes.CALENDAR, userEmail)
     val events = service.events.list("primary")
@@ -323,4 +323,11 @@ object GoogleAdmin{
 
     events.asScala.toList
   }
+
+  def PutCalendarEvent(userEmail: String, event: Event): Unit = {
+    val service = getCalendarService(CalendarScopes.CALENDAR, userEmail)
+    service.events().insert("primary", event).execute()
+  }
+
+
 }
