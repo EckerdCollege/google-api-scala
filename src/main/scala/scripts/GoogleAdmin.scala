@@ -6,12 +6,13 @@ import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
 import com.google.api.services.admin.directory.model._
+import com.typesafe.config.ConfigFactory
 
 import collection.JavaConverters._
 import scala.annotation.tailrec
 import persistence.entities.representations.GoogleIdentity
 
-import scala.util.{Try, Success, Failure}
+import scala.util.{Failure, Success, Try}
 
 
 /**
@@ -29,10 +30,12 @@ object GoogleAdmin{
   private def getDirectoryService(DirectoryScope:String): Directory = {
     import java.util._
 
-    val SERVICE_ACCOUNT_EMAIL = "wso2-admin2@ellucian-identity-service-1282.iam.gserviceaccount.com"
-    val SERVICE_ACCOUNT_PKCS12_FILE_PATH = "/home/davenpcm/Downloads/Ellucian Identity Service-8c565b08687e.p12"
-    val APPLICATION_NAME = "Ellucian Identity Service"
-    val USER_EMAIL = "wso_admin@eckerd.edu"
+    val conf = ConfigFactory.load().getConfig("google")
+    val SERVICE_ACCOUNT_EMAIL = conf.getString("email")
+    val SERVICE_ACCOUNT_PKCS12_FILE_PATH = conf.getString("pkcs12FilePath")
+    val APPLICATION_NAME = conf.getString("applicationName")
+    val USER_EMAIL = conf.getString("impersonatedEmail")
+
 
     val httpTransport = new NetHttpTransport()
     val jsonFactory = new JacksonFactory
