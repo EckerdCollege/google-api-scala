@@ -4,9 +4,15 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
+import com.google.api.client.util.DateTime
+import com.google.api.services.admin.directory
 import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
 import com.google.api.services.admin.directory.model._
 import com.typesafe.config.ConfigFactory
+import com.google.api.services.calendar.CalendarScopes
+import com.google.api.services.calendar.model._
+import com.google.api.services.drive.DriveScopes
+import com.google.api.services.gmail.GmailScopes
 
 import collection.JavaConverters._
 import scala.annotation.tailrec
@@ -20,6 +26,15 @@ import scala.util.{Failure, Success, Try}
   */
 object GoogleAdmin{
 
+  val ListScopes = List(
+    DirectoryScopes.ADMIN_DIRECTORY_USER,
+    DirectoryScopes.ADMIN_DIRECTORY_GROUP,
+    DirectoryScopes.ADMIN_DIRECTORY_GROUP_MEMBER,
+    CalendarScopes.CALENDAR,
+    DriveScopes.DRIVE,
+    GmailScopes.GMAIL_COMPOSE
+  )
+  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
   /**
     * This function is currently configured for a service account to interface with the school. It has been granted
     * explicitly these grants so to change the scope these need to be implemented in Google first.
@@ -61,6 +76,42 @@ object GoogleAdmin{
       .build()
 
     directory
+  }
+
+  private def getCalendarService(Scope:String, USER_EMAIL: String): com.google.api.services.calendar.Calendar
+  = {
+    import java.util._
+
+    val conf = ConfigFactory.load().getConfig("google")
+    val SERVICE_ACCOUNT_EMAIL = conf.getString("email")
+    val SERVICE_ACCOUNT_PKCS12_FILE_PATH = conf.getString("pkcs12FilePath")
+    val APPLICATION_NAME = conf.getString("applicationName")
+
+
+    val httpTransport = new NetHttpTransport()
+    val jsonFactory = new JacksonFactory
+
+    val credential = new GoogleCredential.Builder()
+      .setTransport( httpTransport)
+      .setJsonFactory(jsonFactory)
+      .setServiceAccountId(SERVICE_ACCOUNT_EMAIL)
+      .setServiceAccountScopes( Collections.singleton( Scope ) )
+      .setServiceAccountPrivateKeyFromP12File(
+        new java.io.File(SERVICE_ACCOUNT_PKCS12_FILE_PATH)
+      )
+      .setServiceAccountUser(USER_EMAIL)
+      .build()
+
+    //    if (!credential.refreshToken()) {
+    //      throw new RuntimeException("Failed OAuth to refresh the token")
+    //    }
+
+    val calendar = new com.google.api.services.calendar.Calendar.Builder(httpTransport, jsonFactory, credential)
+      .setApplicationName(APPLICATION_NAME)
+      .setHttpRequestInitializer(credential)
+      .build()
+
+    calendar
   }
 
   /**
@@ -259,4 +310,17 @@ object GoogleAdmin{
     }
   }
 
+  def GetCalendarEvents(userEmail: String) = {
+    val now = new DateTime(System.currentTimeMillis())
+    val service = getCalendarService(CalendarScopes.CALENDAR, userEmail)
+    val events = service.events.list("primary")
+      .setMaxResults(500)
+      .setTimeMin(now)
+      .setOrderBy("startTime")
+      .setSingleEvents(true)
+      .execute()
+      .getItems
+
+    events.asScala.toList
+  }
 }
