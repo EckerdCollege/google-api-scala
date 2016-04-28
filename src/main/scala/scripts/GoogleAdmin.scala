@@ -324,9 +324,36 @@ object GoogleAdmin{
     events.asScala.toList
   }
 
-  def PutCalendarEvent(userEmail: String, event: Event): Unit = {
+  private def PutCalendarEvent(userEmail: String, event: Event): Unit = {
     val service = getCalendarService(CalendarScopes.CALENDAR, userEmail)
-    service.events().insert("primary", event).execute()
+    service.events()
+      .insert("primary", event)
+      .setSendNotifications(true)
+      .execute()
+  }
+
+  def CreateSingularEvent(title: String,
+                          description: String,
+                          startTime: String,
+                          endTime: String,
+                          primaryEmail: String,
+                          participantEmails: List[String] = List[String]()
+                         ): Unit = {
+    val event = new Event
+    val start = new EventDateTime()
+      .setDateTime(new DateTime(startTime))
+    val end = new EventDateTime()
+      .setDateTime(new DateTime(endTime))
+    val participants = participantEmails.map(participantEmail => new EventAttendee().setEmail(participantEmail)).asJava
+
+
+    event.setSummary(title)
+    event.setDescription(description)
+    event.setStart(start)
+    event.setEnd(end)
+    event.setAttendees(participants)
+
+    PutCalendarEvent(primaryEmail, event)
   }
 
 
