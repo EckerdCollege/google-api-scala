@@ -25,17 +25,28 @@ object GoogleUpdateGroupMaster extends App {
 
   val groups = listAllGroups()
 
-  val groupidents = groups.map(group =>
-    GroupMaster_R( group.getId,
-      "N",
-      group.getName,
-      group.getEmail,
-      group.getDirectMembersCount,
-      Option(group.getDescription.take(254))
+  val existsTupleFuture = Future.sequence( groups.par.map(group =>  db.run(GROUP_MASTER_TABLEQUERY.withFilter(a => a.id === group.getId).result).map(a => (group, a.headOption))).seq)
+
+  val FutureMadness = existsTupleFuture.map(
+    tuples => tuples.map(
+      tuple =>
+        GroupMaster_R(
+          tuple._1.getId,
+          tuple._2 match {
+          case None => "N"
+          case Some(rec) => rec.autoIndicator
+          },
+          tuple._1.getName,
+          tuple._1.getEmail,
+          tuple._1.getDirectMembersCount,
+          Option(tuple._1.getDescription.take(254))
+        )
     )
   )
 
-  val whatIsThis = Future.sequence( groupidents.map(group =>   db.run(GROUP_MASTER_TABLEQUERY.insertOrUpdate(group))))
+  val currentGroups = Await.result(FutureMadness, Duration.Inf)
+
+  val whatIsThis = Future.sequence( currentGroups.map( group =>   db.run(GROUP_MASTER_TABLEQUERY.insertOrUpdate(group))))
   Await.result(whatIsThis, Duration.Inf)
 
 }
