@@ -43,7 +43,8 @@ object GoogleUpdateGroupMaster extends App {
           tuple._1.getName,
           tuple._1.getEmail,
           tuple._1.getDirectMembersCount,
-          Option(tuple._1.getDescription.take(254))
+          Option(tuple._1.getDescription.take(254)),
+          tuple._2.flatMap(rec => rec.processIndicator)
         )
     )
   )

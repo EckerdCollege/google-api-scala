@@ -8,5 +8,6 @@ case class GroupMaster_R(id: String,
                          name: String,
                          email: String,
                          count: Long,
-                         desc: Option[String]
+                         desc: Option[String],
+                         processIndicator: Option[String] = None
                         )

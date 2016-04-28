@@ -10,6 +10,8 @@ import GoogleAdmin.{listAllGroupMembers, listAllGroups}
 import persistence.entities.representations.Group2Ident_R
 import persistence.entities.tables.GROUPTOIDENT
 
+import scala.util.Try
+
 /**
   * Created by davenpcm on 4/21/2016.
   */
@@ -22,7 +24,9 @@ object GoogleUpdateGroupToIdent extends App {
 
 
   val group2IdentTableQuery = TableQuery[GROUPTOIDENT]
-  Await.result(db.run( group2IdentTableQuery.schema.create), Duration.Inf)
+
+  // Create Table or Silently Fail
+  Try(Await.result(db.run( group2IdentTableQuery.schema.create), Duration.Inf))
 
   val groups = listAllGroups()
 
@@ -50,7 +54,8 @@ object GoogleUpdateGroupToIdent extends App {
         case Some(rec) => rec.autoIndicator
       },
       tuple._1.memberRole,
-      tuple._1.memberType
+      tuple._1.memberType,
+      tuple._2.flatMap(rec => rec.processIndicator)
     )
 
   )

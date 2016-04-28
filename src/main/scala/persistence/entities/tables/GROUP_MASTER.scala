@@ -11,9 +11,11 @@ class GROUP_MASTER(tag: Tag) extends Table[GroupMaster_R](tag, "GROUP_MASTER"){
   def email = column[String]("EMAIL")
   def count = column[Long]("MEMBER_COUNT")
   def desc = column[Option[String]]("DESCRIPTION")
+  def processIndicator = column[Option[String]]("PROCESS_INDICATOR")
 
 
 
 
-  def * = (id, autoIndicator , name, email, count, desc) <> (GroupMaster_R.tupled, GroupMaster_R.unapply)
+  def * = (id, autoIndicator , name, email, count, desc, processIndicator) <>
+    (GroupMaster_R.tupled, GroupMaster_R.unapply)
 }

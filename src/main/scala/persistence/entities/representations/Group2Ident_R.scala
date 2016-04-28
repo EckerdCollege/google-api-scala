@@ -8,5 +8,6 @@ case class Group2Ident_R(
                           identID: String,
                           autoIndicator: String,
                           memberRole: String,
-                          memberType: String
+                          memberType: String,
+                          processIndicator: Option[String] = None
                         )
