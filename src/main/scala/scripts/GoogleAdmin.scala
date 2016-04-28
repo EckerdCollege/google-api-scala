@@ -332,18 +332,21 @@ object GoogleAdmin{
       .execute()
   }
 
-  def CreateSingularEvent(title: String,
-                          description: String,
-                          startTime: String,
-                          endTime: String,
-                          primaryEmail: String,
-                          participantEmails: List[String] = List[String]()
-                         ): Unit = {
+  def CreateEvent(title: String,
+                  description: String,
+                  startTime: String,
+                  endTime: String,
+                  primaryEmail: String,
+                  participantEmails: List[String] = List[String](),
+                  recurrence: String = ""
+                 ): Unit = {
     val event = new Event
     val start = new EventDateTime()
       .setDateTime(new DateTime(startTime))
+      .setTimeZone("America/New_York")
     val end = new EventDateTime()
       .setDateTime(new DateTime(endTime))
+      .setTimeZone("America/New_York")
     val participants = participantEmails.map(participantEmail => new EventAttendee().setEmail(participantEmail)).asJava
 
 
@@ -352,6 +355,10 @@ object GoogleAdmin{
     event.setStart(start)
     event.setEnd(end)
     event.setAttendees(participants)
+    if (recurrence != ""){
+      val recurrenceList = List(recurrence).asJava
+      event.setRecurrence(recurrenceList)
+    }
 
     PutCalendarEvent(primaryEmail, event)
   }
