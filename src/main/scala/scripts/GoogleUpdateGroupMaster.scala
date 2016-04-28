@@ -6,10 +6,11 @@ import utils.persistence.PersistenceModuleImpl
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-
 import GoogleAdmin.listAllGroups
 import persistence.entities.representations.GroupMaster_R
 import persistence.entities.tables.GROUP_MASTER
+
+import scala.util.Try
 
 /**
   * Created by davenpcm on 4/21/2016.
@@ -21,11 +22,14 @@ object GoogleUpdateGroupMaster extends App {
 
   val GROUP_MASTER_TABLEQUERY = TableQuery[GROUP_MASTER]
 
-  Await.result(db.run(GROUP_MASTER_TABLEQUERY.schema.create ), Duration.Inf)
+  // Create Table or Silently Fail
+  Try(Await.result(db.run(GROUP_MASTER_TABLEQUERY.schema.create ), Duration.Inf))
 
   val groups = listAllGroups()
 
-  val existsTupleFuture = Future.sequence( groups.par.map(group =>  db.run(GROUP_MASTER_TABLEQUERY.withFilter(a => a.id === group.getId).result).map(a => (group, a.headOption))).seq)
+  val existsTupleFuture = Future.sequence( groups.par.map(group =>
+    db.run(GROUP_MASTER_TABLEQUERY.withFilter(a => a.id === group.getId).result)
+      .map(matchingRecs => (group, matchingRecs.headOption))).seq)
 
   val FutureMadness = existsTupleFuture.map(
     tuples => tuples.map(
@@ -46,7 +50,8 @@ object GoogleUpdateGroupMaster extends App {
 
   val currentGroups = Await.result(FutureMadness, Duration.Inf)
 
-  val whatIsThis = Future.sequence( currentGroups.map( group =>   db.run(GROUP_MASTER_TABLEQUERY.insertOrUpdate(group))))
+  val whatIsThis = Future.sequence( currentGroups.map( group =>
+    db.run(GROUP_MASTER_TABLEQUERY.insertOrUpdate(group))))
   Await.result(whatIsThis, Duration.Inf)
 
 }
