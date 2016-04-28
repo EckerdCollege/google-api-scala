@@ -292,16 +292,29 @@ object GoogleAdmin{
     googleIdentitiesSets
   }
 
-  def AddUserToGroup(groupKey: String, id: String, service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP)) = {
+  def AddUserToGroup(groupKey: String, id: String,
+                     service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
+                    ): Member = {
+
     val newMember = new Member
     newMember.setId(id)
     newMember.setRole("MEMBER")
 
-    val returnType = service.members().insert(groupKey, newMember).execute()
-    returnType
+    val InsertedMember = service.members().insert(groupKey, newMember).execute()
+    InsertedMember
   }
 
-  def GetUserPhoto(userKey: String, service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_USER)): Option[UserPhoto] = {
+  def RemoveUserFromGroup(groupKey: String,
+                          userId: String,
+                          service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
+                         ): Unit = {
+    service.members().delete(groupKey, userId).execute()
+  }
+
+  def GetUserPhoto(userKey: String,
+                   service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_USER)
+                  ): Option[UserPhoto] = {
+
     val returnType = Try( service.users().photos().get(userKey).execute() )
 
     returnType match {
@@ -347,7 +360,9 @@ object GoogleAdmin{
     val end = new EventDateTime()
       .setDateTime(new DateTime(endTime))
       .setTimeZone("America/New_York")
-    val participants = participantEmails.map(participantEmail => new EventAttendee().setEmail(participantEmail)).asJava
+    val participants = participantEmails.map( participantEmail =>
+      new EventAttendee().setEmail(participantEmail)
+    ).asJava
 
 
     event.setSummary(title)

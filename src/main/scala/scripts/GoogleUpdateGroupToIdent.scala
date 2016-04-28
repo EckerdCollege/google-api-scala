@@ -34,7 +34,8 @@ object GoogleUpdateGroupToIdent extends App {
     listAllGroupMembers(ident.email)
     .map(member =>
       (Group2Ident_R(ident.id, member.getId,"", member.getRole, member.getType),
-        Await.result(db.run(group2IdentTableQuery.withFilter(rec => rec.groupId === ident.id && rec.identID === member.getId).result.headOption), Duration(1, "second"))))
+        Await.result(db.run(group2IdentTableQuery.withFilter(rec =>
+          rec.groupId === ident.id && rec.identID === member.getId).result.headOption), Duration(1, "second"))))
   )
 
   val Tuples = group2Members
