@@ -20,6 +20,7 @@ object GoogleUpdateGroupToIdent extends App {
   case class Group2Ident(
                           groupId: String,
                           identID: String,
+                          autoIndicator: String,
                           memberRole: String,
                           memberType: String
                         )
@@ -27,10 +28,11 @@ object GoogleUpdateGroupToIdent extends App {
   class GROUPTOIDENT(tag: Tag) extends Table[Group2Ident](tag, "GROUP_TO_IDENT") {
     def groupId = column[String]("GROUP_ID")
     def identID = column[String]("IDENT_ID")
+    def autoIndicator = column[String]("AUTO_INDICATOR")
     def memberRole = column[String]("MEMBER_ROLE")
     def memberType = column[String]("MEMBER_TYPE")
 
-    def * = (groupId, identID, memberRole, memberType) <> (Group2Ident.tupled, Group2Ident.unapply )
+    def * = (groupId, identID, autoIndicator, memberRole, memberType) <> (Group2Ident.tupled, Group2Ident.unapply )
   }
   
   val group2IdentTableQuery = TableQuery[GROUPTOIDENT]
@@ -42,7 +44,7 @@ object GoogleUpdateGroupToIdent extends App {
     GroupIdent( group.getId, group.getName, group.getEmail, group.getDirectMembersCount, group.getDescription)
   )
 
-  val group2Members = groupidents.map(ident => listAllGroupMembers(ident.email).map(member => Group2Ident(ident.id, member.getId, member.getRole, member.getType)))
+  val group2Members = groupidents.par.map(ident => listAllGroupMembers(ident.email).map(member => Group2Ident(ident.id, member.getId,"N", member.getRole, member.getType)))
     .foldLeft(List[Group2Ident]())((acc, next) => next ::: acc)
 
 //  val group2Members = List(Group2Ident("test", "test"))
