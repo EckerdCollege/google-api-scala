@@ -6,7 +6,6 @@ import utils.persistence.PersistenceModuleImpl
 import com.typesafe.slick.driver.oracle.OracleDriver.api._
 import persistence.entities.constructs.{AutoEntity, AutoTable}
 import persistence.entities.representations.{Group2Ident_R, GroupMaster_R}
-import slick.driver.JdbcProfile
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -101,5 +100,7 @@ object ClassGroups {
   private def AddToGoogleByGroupMaster(group: GroupMaster_R): Unit = {
     ???
   }
+
+
 
 }
