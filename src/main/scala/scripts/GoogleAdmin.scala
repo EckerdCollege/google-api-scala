@@ -292,6 +292,12 @@ object GoogleAdmin{
     googleIdentitiesSets
   }
 
+  def DeleteGroup(groupKey: String,
+                  service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
+                 ): Unit = {
+    service.groups().delete(groupKey).execute()
+  }
+
   def AddUserToGroup(groupKey: String, id: String,
                      service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
                     ): Member = {
