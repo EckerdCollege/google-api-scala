@@ -16,68 +16,81 @@ import scala.concurrent.duration.Duration
   */
 object ClassGroups {
 
-  private object SavedState {
-    val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
-    implicit val db = modules.db
+  val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
+  implicit val db = modules.db
 
-  }
 
-  private def AlterBasedOnAutoTable[T <: AutoTable[A], A <: AutoEntity ](query: TableQuery[T])
-                                                          (autoIndicator: String,  processIndicator: String)
-                                                          (t: Query[T, A, Seq] => Unit) = {
+
+  private def AlterBasedOnAutoTable[T <: AutoTable[A], A <: AutoEntity ]
+  (autoIndicator: String,  processIndicator: Option[String])
+  (query: TableQuery[T])
+  (t: Query[T, A, Seq] => Unit)
+   = {
 
     val selection = query.withFilter(record =>
     record.autoIndicator === autoIndicator && record.processIndicator === processIndicator)
-
+    println(selection)
     t(selection)
   }
 
-
-
-  private def AlterOnGroup2Ident(autoIndicator: String,  processIndicator: String)(t: Query[GROUPTOIDENT, Group2Ident_R, Seq] => Unit) = {
-    AlterBasedOnAutoTable[GROUPTOIDENT, Group2Ident_R](TableQuery[GROUPTOIDENT])(autoIndicator,  processIndicator)(t)
+  private def AlterOnAutoDelete[T <: AutoTable[A], A <: AutoEntity](query: TableQuery[T])
+                               (t: Query[T, A, Seq] => Unit) = {
+    AlterBasedOnAutoTable[T,A]("Y", Some("D"))(query)(t)
   }
 
-  private def AlterOnGroup2IdentAutoDelete(t: Query[GROUPTOIDENT, Group2Ident_R, Seq] => Unit) = {
-    AlterOnGroup2Ident("Y", "D")(t)
+  private def AlterOnAutoCreate[T <: AutoTable[A], A <: AutoEntity]
+  (query: TableQuery[T])
+  (t: Query[T, A, Seq] => Unit) = {
+    AlterBasedOnAutoTable[T,A]("Y", Some("C"))(query)(t)
   }
 
-  private def AlterOnGroup2IdentCreate(t: Query[GROUPTOIDENT, Group2Ident_R, Seq] => Unit) = {
-    AlterOnGroup2Ident("Y", "C")(t)
+  private def AlterOnGroup2IdentOnAutoDelete(t: Query[GROUPTOIDENT, Group2Ident_R, Seq] => Unit) = {
+    AlterOnAutoDelete[GROUPTOIDENT, Group2Ident_R](TableQuery[GROUPTOIDENT])(t)
   }
 
-  private def DeleteGroup2IdentSelection(query: Query[GROUPTOIDENT, Group2Ident_R, Seq]): Unit = {
-    SavedState.db.run(query.delete)
-
+  private def AlterOnGroup2IdentAutoCreate(t: Query[GROUPTOIDENT, Group2Ident_R, Seq] => Unit) = {
+    AlterOnAutoCreate[GROUPTOIDENT, Group2Ident_R](TableQuery[GROUPTOIDENT])(t)
   }
 
+  private def RemoveFromGoogleByGroup2Ident(ident: Group2Ident_R): Unit = {
+    scripts.GoogleAdmin.RemoveUserFromGroup(ident.groupId, ident.identID)
+  }
 
-  private def AddtoGoogleByGroup2Ident(ident: Group2Ident_R): Unit = {
+  private def AddToGoogleByGroup2Ident(ident: Group2Ident_R): Unit = {
     scripts.GoogleAdmin.AddUserToGroup(ident.groupId, ident.identID)
   }
 
   private def SelectionRemoveMembersFromGoogleGroup(query: Query[GROUPTOIDENT, Group2Ident_R, Seq]): Unit = {
-    def RemoveFromGoogleByGroup2Ident(ident: Group2Ident_R): Unit = {
-      scripts.GoogleAdmin.RemoveUserFromGroup(ident.groupId, ident.identID)
-    }
-    val result = Await.result(SavedState.db.run(query.result), Duration(5, "seconds"))
+    val result = Await.result(db.run(query.result), Duration(5, "seconds"))
     result.foreach(RemoveFromGoogleByGroup2Ident(_))
   }
 
-
-
-
-  private def DeleteMembersFromTable(): Unit = {
-    AlterOnGroup2IdentAutoDelete(DeleteGroup2IdentSelection)
+  private def DeleteGroup2IdentSelection(query: Query[GROUPTOIDENT, Group2Ident_R, Seq]): Unit = {
+    Await.result(db.run(query.delete), Duration(5, "seconds"))
   }
-  private def RemoveMembersFromGoogleGroup(): Unit = {
-    AlterOnGroup2IdentAutoDelete(SelectionRemoveMembersFromGoogleGroup)
+
+  private def SelectionCreateMemberGoogleGroup(query: Query[GROUPTOIDENT, Group2Ident_R, Seq]): Unit = {
+
+    val result = Await.result(db.run(query.result), Duration(5, "seconds"))
+    println(result)
+    val newEntries = result.map(rec => rec.copy(processIndicator = None))
+    println(newEntries)
+    result.foreach(AddToGoogleByGroup2Ident(_))
+    result.foreach(println(_))
+    DeleteGroup2IdentSelection(query)
+    Await.result(db.run(TableQuery[GROUPTOIDENT] ++= newEntries), Duration(5, "seconds"))
   }
+
+  def CreateMembersGoogleGroup(): Unit = {
+    AlterOnGroup2IdentAutoCreate(SelectionCreateMemberGoogleGroup)
+  }
+
 
   def RemoveMembersFromGoogle(): Unit = {
-    RemoveMembersFromGoogleGroup()
-    DeleteMembersFromTable()
+    AlterOnGroup2IdentOnAutoDelete(SelectionRemoveMembersFromGoogleGroup)
+    AlterOnGroup2IdentOnAutoDelete(DeleteGroup2IdentSelection)
   }
+
 
 
 
@@ -88,28 +101,5 @@ object ClassGroups {
   private def AddToGoogleByGroupMaster(group: GroupMaster_R): Unit = {
     ???
   }
-
-
-//  def AddMembersToGroups(): Unit = {
-//    AlterBasedOnAutoTable[GROUPTOIDENT, Group2Ident_R](TableQuery[GROUPTOIDENT]
-//    )(AddtoGoogleByGroup2Ident)("Y", "A")(a => Unit)
-//  }
-//
-//  def deleteGroups(): Unit = {
-//    AlterBasedOnAutoTable[GROUP_MASTER, GroupMaster_R](TableQuery[GROUP_MASTER]
-//    )(RemoveFromGoogleByGroupMaster)("Y", "D")(DeleteSelectionFromTable)
-//  }
-  //  def deleteMembersFromGroups(): Unit = {
-  //    AlterBasedOnAutoTable[GROUPTOIDENT, Group2Ident_R](TableQuery[GROUPTOIDENT]
-  //    )(RemoveFromGoogleByGroup2Ident)("Y", "D")(DeleteSelectionFromTable)
-  //  }
-//private def DeleteSelectionFromTable[T <: AutoTable[A], A <: AutoEntity ](selection: Query[T, A, Seq] ): Unit = {
-  //    val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
-  //    import modules.dbConfig.driver.api._
-  //    Await.result( modules.db.run(selection.delete), Duration(10, "seconds"))
-  //  }
-
-
-
 
 }
