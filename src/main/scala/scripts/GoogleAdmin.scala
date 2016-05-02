@@ -151,6 +151,22 @@ object GoogleAdmin{
   }
 
   /**
+    *  This returns the user from a string. Be Aware this user
+    * @param identifier The identifier used to get the user
+    * @param service The service to use to to find the user
+    * @return
+    */
+  def getUser(identifier: String,
+              service: Directory = getDirectoryService(DirectoryScopes.ADMIN_DIRECTORY_USER)): Option[User] = {
+    val user = service.users().get(identifier).execute()
+    val exists = Option(user.getId)
+    exists match {
+      case None => None
+      case Some(value) => Some(user)
+    }
+  }
+
+  /**
     * This function simply returns a list of all groups in the organization.
     *
     * @param service The Directory Service We Are Getting the Groups From
