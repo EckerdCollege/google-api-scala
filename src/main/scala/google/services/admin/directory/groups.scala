@@ -36,18 +36,29 @@ object groups {
       .map(groups => groups.getGroups.asScala.toList)
       .foldLeft(List[Group]())((acc, listGroups) => listGroups ::: acc)
 
-    val mylist = typedList ::: groups
+    val myList = typedList ::: groups
 
     val nextPageToken = result.getNextPageToken
 
-    if (nextPageToken != null && result.getGroups != null) list(service, nextPageToken, mylist) else mylist
+    if (nextPageToken != null && result.getGroups != null) list(service, nextPageToken, myList) else myList
   }
 
+  /**
+    * This creates a google group
+    * @param group This is the group to be created
+    * @param service This is the service used to create the group. Needs DIRECTORY_GROUPS
+    * @return The group created with all the information google has filled in on top what was originally entered.
+    */
   def create(group: Group,
              service: Directory): Group = {
     service.groups().insert(group).execute()
   }
 
+  /**
+    * Deletes A Google Group
+    * @param groupKey The Key of the group either the email adress or the unique key
+    * @param service The service to use to delete Group. Requires DIRECTORY_GROUPS
+    */
   def delete(groupKey: String,
              service: Directory
             ): Unit = {
