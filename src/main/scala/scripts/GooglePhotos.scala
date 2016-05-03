@@ -1,9 +1,13 @@
 package scripts
 import java.io.FileOutputStream
 
+import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
 import com.google.api.services.admin.directory.model.User
 import com.google.common.io.BaseEncoding
 import persistence.entities.representations.Image
+import google.services.admin.directory.photos._
+import google.services.service._
+import google.services.admin.directory.users._
 
 /**
   * Created by davenpcm on 4/27/16.
@@ -17,7 +21,7 @@ object GooglePhotos extends App {
     * @param user This is a user object from google.
     * @return A tuple mapping the id to the option image created by the process.
     */
-  def getGoogleImage(outputFolder: String, user: User): (String, Option[Image]) = {
+  def getGoogleImage(outputFolder: String, user: User, service: Directory): (User, Option[Image]) = {
     val id = user.getId
     /**
       * Simple Parse to Make Sure the Folder String is Properly Ended with a Slash
@@ -63,38 +67,36 @@ object GooglePhotos extends App {
       * @param user A google user
       * @return An Option of an Image if it Exists
       */
-    def convertUserToImage(user: User): Option[Image] = {
-      val userPhoto = GoogleAdmin.GetUserPhoto(user.getId)
+    def convertUserToImage(user: User, service: Directory): Option[Image] = {
+      val userPhoto = get(user.getId, service)
       userPhoto match {
-        case Some(photo) =>
+        case Right(photo) =>
           val extension = mimeTypeToExtension(photo.getMimeType)
           val byteArray = convertToImage(getBase64CssImage(photo.getPhotoData))
           val parsedFolder = parseOutputFolder(outputFolder)
           val image = Image(s"$parsedFolder$id$extension", byteArray)
           Some(image)
-        case None => None
+        case Left(error) => None
       }
-
     }
 
-    /**
-      * Writes an image to disk at the location specified
-      * @param image An Option of An Image Object
-      * @return It should be the same Image Object Passed In. Performs SideEffect Writing to Disk As It Moves
-      *         Through This Section.
-      */
-    def createFile(image: Option[Image]): Option[Image] = image match {
-      case None => None
-      case Some(i) =>
-        val file = new FileOutputStream(i.filename)
-        file.write(i.data)
-        file.close()
-        Some(i)
-    }
+    val image = convertUserToImage(user, service)
 
-    val image = convertUserToImage(user)
-    val file = createFile(image)
-    (id, file)
+    (user, image)
+  }
+
+  /**
+    * Writes an image to disk at the location specified
+    * @param image An Option of An Image Object
+    * @return It should be the same Image Object Passed In. Performs SideEffect Writing to Disk As It Moves
+    *         Through This Section.
+    */
+  def create(image: Option[Image]): Unit = image match {
+    case None =>
+    case Some(i) =>
+      val file = new FileOutputStream(i.filename)
+      file.write(i.data)
+      file.close()
   }
 
   /**
@@ -102,16 +104,14 @@ object GooglePhotos extends App {
     * @param outputFolder This is the folder to write to
     * @return A Sequence for all google users of the user id and the option of an image created.
     */
-  def getAllGoogleImages(outputFolder: String): Seq[(String, Option[Image])] = {
+  def getAllGoogleImages( outputFolder: String, service: Directory): Seq[(User, Option[Image])] = {
 
-    val parImages = GoogleAdmin.listAllUsers()
+    val parImages = list(service)
       .par
-      .map(getGoogleImage(outputFolder, _))
+      .map(getGoogleImage(outputFolder, _, service))
 
     parImages.seq
   }
 
-  val images = getAllGoogleImages("/home/davenpcm/Pictures/Student")
-  images.foreach(println)
 
 }
