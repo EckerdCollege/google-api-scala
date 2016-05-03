@@ -2,18 +2,21 @@ package scripts
 
 import java.sql.Timestamp
 
+import com.google.api.services.admin.directory.Directory
+import com.google.api.services.admin.directory.model.User
 import persistence.entities.representations.{GOBUMAP_R, GOREMAL_R, GoogleIdentity}
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
-
+import google.services.admin.directory.users._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
+import google.services.service._
 
 /**
   * Created by davenpcm on 4/15/2016.
   */
-object GoogleUpdateGobumap extends App {
+object GoogleUpdateGobumap {
 
   val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
   import modules.dbConfig.driver.api._
@@ -27,7 +30,7 @@ object GoogleUpdateGobumap extends App {
     * @return This returns a Future of a Tuple of String and Int So we can match the email address to the int mapping
     *         each google identity to the job that was performed within the GOBUMAP InsertUpdate
     */
-  def GOBUMAPInsertUpdate(googleIdentity: GoogleIdentity): Future[(String,Int)] = {
+  private def GOBUMAPInsertUpdate(googleIdentity: GoogleIdentity): Future[(String,Int)] = {
 
 
     /**
@@ -290,11 +293,27 @@ object GoogleUpdateGobumap extends App {
     googleStringer(googleIdentity).map(a => (googleIdentity.primaryEmail, a))
   }
 
-//  val idents = ReturnGoogleIdentities(fileName) // The Identities From The Spreadsheet
-  val idents = GoogleAdmin.ReturnAllGoogleIdentities()
-  val future = Future.sequence(idents.map(GOBUMAPInsertUpdate(_))) // The Actual Database Transactions Grouped
+  private def ReturnAllGoogleIdentities(service: Directory): List[GoogleIdentity] = {
 
-  val ints = Await.result(future, Duration(60, "seconds")) // Waiting for all futures to complete 60s timeout
-  ints.filter(a => a._2 != 0 ).foreach(println(_)) // Print Out Any Values Updated Or Inserted
+    /**
+      * Simple Transformation between the Google User Objects ID and Primary Email and a GoogleIdentity Case Class
+      * @param user Google User Object
+      * @return A GoogleIdentity
+      */
+    def UserToGoogleIdent(user: User): GoogleIdentity = {
+      GoogleIdentity(user.getId, user.getPrimaryEmail)
+    }
+
+    val googleIdentitiesSets = transformAllGoogleUsers[GoogleIdentity](service)(UserToGoogleIdent)
+
+    googleIdentitiesSets
+  }
+
+  def update(service: Directory): List[(String, Int)] = {
+    val idents = ReturnAllGoogleIdentities(service)
+    val future = Future.sequence(idents.map(GOBUMAPInsertUpdate(_))) // The Actual Database Transactions Grouped
+    val tuples = Await.result(future, Duration(60, "seconds")) // Waiting for all futures to complete 60s timeout
+    tuples
+  }
 
 }
