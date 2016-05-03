@@ -30,7 +30,7 @@ object members {
                           service: Directory,
                           pageToken: String = "",
                           members: List[Member] = List[Member]()
-                         ): List[Member] = {
+                         ): Either[Throwable, List[Member]] = {
 
     val resultTry = Try(
       service.members()
@@ -51,30 +51,29 @@ object members {
 
         val nextPageToken = result.getNextPageToken
 
-        if (nextPageToken != null && result.getMembers != null) list(groupKey, service, nextPageToken, myList) else myList
+        if (nextPageToken != null && result.getMembers != null) list(groupKey, service, nextPageToken, myList) else Right(myList)
 
-      case Failure(exception: GoogleJsonResponseException) => list(groupKey, service, pageToken, members)
-      case Failure(e) => throw e
+      case Failure(ex) => Left(ex)
     }
 
   }
 
-  def AddUserToGroup(groupKey: String, id: String,
+  def add(groupKey: String, newMemberId: String, role: String,
                      service: Directory
                     ): Member = {
 
     val newMember = new Member
-    newMember.setId(id)
-    newMember.setRole("MEMBER")
+    newMember.setId(newMemberId)
+    newMember.setRole(role)
 
     val InsertedMember = service.members().insert(groupKey, newMember).execute()
     InsertedMember
   }
 
-  def RemoveUserFromGroup(groupKey: String,
-                          userId: String,
-                          service: Directory
-                         ): Unit = {
+  def remove(groupKey: String,
+             userId: String,
+             service: Directory
+            ): Unit = {
     service.members().delete(groupKey, userId).execute()
   }
 
