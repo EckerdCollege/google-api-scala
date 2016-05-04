@@ -16,6 +16,7 @@ object CommandLine extends App{
     DirectoryScopes.ADMIN_DIRECTORY_GROUP_MEMBER,
     CalendarScopes.CALENDAR,
     DriveScopes.DRIVE,
+    DriveScopes.DRIVE_APPDATA,
     GmailScopes.GMAIL_COMPOSE
   )
 
@@ -34,7 +35,7 @@ object CommandLine extends App{
     "davenpcm@eckerd.edu",
     credentialFilePath,
     applicationName,
-    DriveScope
+    ListScopes
   )
   val service = getDrive(credential, applicationName)
 
@@ -42,20 +43,30 @@ object CommandLine extends App{
 //  val photoshop = these.filter(_.getMimeType == "image/x-photoshop")
 //  photoshop.foreach(println)
 
-  val file = google.services.drive.files.generateMetaData("TestFolder", "Test Description", "application/vnd.google-apps.folder")
-  println(file)
-  val finishedFile = google.services.drive.files.upload(service, file)
-  println(finishedFile)
+//  val file = google.services.drive.files.generateMetaData("TestFolder", "Test Description", "application/vnd.google-apps.folder", Some(List("appDataFolder")))
+//  println(file)
+//  val finishedFile = google.services.drive.files.upload(service, file)
+//  println(finishedFile)
+//
+//  val mimeType = "image/png"
+//  val picturePath = "/home/davenpcm/Downloads/vim_cheat_sheet_for_programmers_print.png"
+//  val pictureName =  picturePath.substring(picturePath.lastIndexOf("/")+1)
+//  val imageMetaData = google.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
+//  println(imageMetaData)
+//  val imageContent = google.services.drive.files.generateFileContents(picturePath, mimeType)
+//
+//  val finishedImage = google.services.drive.files.upload(service, imageMetaData, imageContent)
+//  println(finishedImage)
 
-  val mimeType = "image/png"
-  val picturePath = "/home/davenpcm/Downloads/vim_cheat_sheet_for_programmers_print.png"
-  val pictureName =  picturePath.substring(picturePath.lastIndexOf("/")+1)
-  val imageMetaData = google.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
-  println(imageMetaData)
-  val imageContent = google.services.drive.files.generateFileContents(picturePath, mimeType)
-
-  val finishedImage = google.services.drive.files.upload(service, imageMetaData, imageContent)
-  println(finishedImage)
+    val path = "/home/davenpcm/Downloads/temp/"
+//    val id = "1kvw_tvL7AkQGSoMj6M7Yh4jDAQBdQwTwc8jirAhXer8"
+    val listAllApp = google.services.drive.files.listApplicationData(service)
+    listAllApp.foreach(println)
+//    val file = google.services.drive.files.get(service, id)
+//    println(file)
+//    google.services.drive.files.delete(service, id)
+//    val download = google.services.drive.files.download(service, path, file)
+//    println(download)
 
 //  val directory = getDirectory(DirectoryScopes.ADMIN_DIRECTORY_USER)
 //  val images = scripts.GooglePhotos.getAllGoogleImages("/home/davenpcm/Pictures/Student", directory)
