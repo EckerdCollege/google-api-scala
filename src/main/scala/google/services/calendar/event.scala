@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 /**
   * Created by davenpcm on 5/3/16.
   */
-class event {
+object event {
 
   def list(service: Calendar): List[Event] = {
     val now = new DateTime(System.currentTimeMillis())
@@ -25,10 +25,10 @@ class event {
     events.asScala.toList
   }
 
-  def put(service: Calendar, event: Event): Event = {
+  def put(service: Calendar, event: Event, calendar: String = "primary", sendNotifications: Boolean = true): Event = {
     service.events()
-      .insert("primary", event)
-      .setSendNotifications(true)
+      .insert(calendar, event)
+      .setSendNotifications(sendNotifications)
       .execute()
   }
 

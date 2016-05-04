@@ -38,36 +38,40 @@ object CommandLine extends App{
     applicationName,
     ListScopes
   )
-  val service = getDrive(credential, applicationName)
+  val service = getCalendar(credential, applicationName)
+
+  val event = google.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
+  val finalevent = google.services.calendar.event.put(service, event)
+//  val service = getDrive(credential, applicationName)
 
 //  val these = google.services.drive.files.list(service)
 //  val photoshop = these.filter(_.getMimeType == "image/x-photoshop")
 //  photoshop.foreach(println)
-
-  val file = google.services.drive.files.generateMetaData("ChrisTestFolderShare", "Test Description", "application/vnd.google-apps.folder")
-  println(file)
-  val finishedFile = google.services.drive.files.upload(service, file)
-  println(finishedFile)
 //
+//  val file = google.services.drive.files.generateMetaData("ChrisTestFolderShare", "Test Description", "application/vnd.google-apps.folder")
+//  println(file)
+//  val finishedFile = google.services.drive.files.upload(service, file)
+//  println(finishedFile)
+////
 //  val mimeType = "image/png"
 //  val picturePath = "/home/davenpcm/Downloads/vim_cheat_sheet_for_programmers_print.png"
 //  val pictureName =  picturePath.substring(picturePath.lastIndexOf("/")+1)
 
 
 
-  val permission = new Permission()
-    .setEmailAddress("abneyfl@eckerd.edu")
-    .setRole("writer")
-    .setType("user")
-
-  println(permission)
-
-  val createpermission = google.services.drive.permissions.create(service, finishedFile.getId, permission, false)
-  println(createpermission)
-
-  val subFolder = google.services.drive.files.generateMetaData("ChrisTestSubFolder", "Random Description", "application/vnd.google-apps.folder", Some(List(finishedFile.getId)))
-  val finishedSubFolder = google.services.drive.files.upload(service, subFolder)
-  println(finishedSubFolder)
+//  val permission = new Permission()
+//    .setEmailAddress("abneyfl@eckerd.edu")
+//    .setRole("writer")
+//    .setType("user")
+//
+//  println(permission)
+//
+//  val createpermission = google.services.drive.permissions.create(service, finishedFile.getId, permission, false)
+//  println(createpermission)
+//
+//  val subFolder = google.services.drive.files.generateMetaData("ChrisTestSubFolder", "Random Description", "application/vnd.google-apps.folder", Some(List(finishedFile.getId)))
+//  val finishedSubFolder = google.services.drive.files.upload(service, subFolder)
+//  println(finishedSubFolder)
 
 //  val imageMetaData = google.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
 //  println(imageMetaData)
