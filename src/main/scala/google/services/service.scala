@@ -1,10 +1,14 @@
 package google.services
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential
+import java.io.FileInputStream
+
+import com.google.api.client.googleapis.auth.oauth2.{GoogleClientSecrets, GoogleCredential}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
 import com.google.api.services.admin.directory.Directory
 import com.typesafe.config.ConfigFactory
+
+import scala.collection.JavaConverters
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -17,7 +21,7 @@ object service {
     * @param DirectoryScope This is the scope that is requested for whatever operations you would like to perform.
     * @return A Google Directory Object which can be used to look through Admin Directory Information
     */
-  def getDirectory(DirectoryScope:String): Directory = {
+  def getDirectory(DirectoryScope:String): com.google.api.services.admin.directory.Directory = {
     import java.util._
 
     val conf = ConfigFactory.load().getConfig("google")
@@ -89,6 +93,58 @@ object service {
       .build()
 
     calendar
+  }
+
+  def getDrive(googleCredential: GoogleCredential, applicationName: String): com.google.api.services.drive.Drive = {
+    val httpTransport = new NetHttpTransport
+    val jsonFactory = new JacksonFactory
+    val drive = new com.google.api.services.drive.Drive.Builder(httpTransport, jsonFactory, googleCredential)
+      .setApplicationName(applicationName)
+      .setHttpRequestInitializer(googleCredential)
+      .build()
+
+    drive
+  }
+
+  def getCredential(serviceAccountEmail: String,
+                    impersonatedEmail: String,
+                    credentialFilePath: String,
+                    applicationName: String,
+                    scopes: List[String]): GoogleCredential = {
+    import scala.collection.JavaConverters._
+    val httpTransport = new NetHttpTransport
+    val jsonFactory = new JacksonFactory
+
+    val initialCred = new GoogleCredential.Builder()
+      .setTransport(httpTransport)
+      .setJsonFactory(jsonFactory)
+      .setServiceAccountScopes(scopes.asJava)
+      .setServiceAccountUser(impersonatedEmail)
+
+
+    val credential: GoogleCredential = credentialFilePath match {
+      case path if path.endsWith(".p12") =>
+        val file = new java.io.File(credentialFilePath)
+        val credential = initialCred
+          .setServiceAccountPrivateKeyFromP12File(file)
+          .build()
+        credential
+
+      case path if path.endsWith(".json") =>
+        val inputStream = this.getClass.getResourceAsStream(credentialFilePath)
+        val inputStreamReader = new java.io.InputStreamReader(inputStream)
+        val clientSecrets = GoogleClientSecrets.load(jsonFactory, inputStreamReader)
+        val credential = initialCred
+          .setClientSecrets(clientSecrets)
+          .build()
+        credential
+    }
+
+    if (!credential.refreshToken()) {
+      throw new RuntimeException("Failed OAuth to refresh the token")
+    }
+
+    credential
   }
 
 }
