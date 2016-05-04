@@ -66,12 +66,14 @@ object service {
       .setServiceAccountUser(impersonatedEmail)
 
     val credential: GoogleCredential = credentialFilePath match {
+
       case path if path.endsWith(".p12") =>
         val file = new java.io.File(credentialFilePath)
         val credential = initCredential
           .setServiceAccountPrivateKeyFromP12File(file)
           .build()
         credential
+
       case path if path.endsWith(".json") =>
         val inputStream = this.getClass.getResourceAsStream(credentialFilePath)
         val inputStreamReader = new java.io.InputStreamReader(inputStream)
@@ -80,6 +82,7 @@ object service {
           .setClientSecrets(clientSecrets)
           .build()
         credential
+
     }
 
     if (!credential.refreshToken()) {
