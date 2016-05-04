@@ -25,7 +25,7 @@ class event {
     events.asScala.toList
   }
 
-  private def put(userEmail: String, event: Event): Event = {
+  def put(userEmail: String, event: Event): Event = {
     val service = getCalendar(CalendarScopes.CALENDAR, userEmail)
     service.events()
       .insert("primary", event)
@@ -40,7 +40,7 @@ class event {
                   primaryEmail: String,
                   participantEmails: List[String] = List[String](),
                   recurrence: String = ""
-                 ): Unit = {
+                 ): Event = {
     val event = new Event
     val start = new EventDateTime()
       .setDateTime(new DateTime(startTime))
@@ -63,6 +63,6 @@ class event {
       event.setRecurrence(recurrenceList)
     }
 
-    put(primaryEmail, event)
+    event
   }
 }
