@@ -20,9 +20,9 @@ object CommandLine extends App{
     GmailScopes.GMAIL_COMPOSE
   )
 
-  val UserScope = List(DirectoryScopes.ADMIN_DIRECTORY_USER)
-  val GroupScope = List(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
-  val DriveScope = List(DriveScopes.DRIVE)
+//  val UserScope = List(DirectoryScopes.ADMIN_DIRECTORY_USER)
+//  val GroupScope = List(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
+//  val DriveScope = List(DriveScopes.DRIVE)
 //  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
 
   val config = ConfigFactory.load().getConfig("google")
@@ -31,14 +31,15 @@ object CommandLine extends App{
   val applicationName = config.getString("applicationName")
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
-  val service = google.services.service()
-
-  val credential = service.getCredential(serviceAccountEmail,
+  val service = google.services.service(
+    serviceAccountEmail,
     adminImpersonatedEmail,
     credentialFilePath,
     applicationName,
     ListScopes
   )
+
+  val credential = service.credential
 
   println(credential.getServiceAccountId)
 

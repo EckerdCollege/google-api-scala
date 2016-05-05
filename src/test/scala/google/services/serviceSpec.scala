@@ -40,7 +40,7 @@ class serviceSpec extends FlatSpec with Matchers {
 
   val credential = service.credential
 
-  "A Google Credential" should "be returned from getCredential" in {
+  "A credential" should "be returned from getCredential" in {
     credential shouldBe a [GoogleCredential]
   }
 

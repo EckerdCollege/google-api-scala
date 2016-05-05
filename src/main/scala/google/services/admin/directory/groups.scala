@@ -21,14 +21,16 @@ object groups {
     */
   @tailrec
   def list(service: Directory,
-                    pageToken: String = "",
-                    groups: List[Group] = List[Group]()
-                   ): List[Group] ={
+           domain: String = "eckerd.edu",
+           resultsPerPage: Int = 500,
+           pageToken: String = "",
+           groups: List[Group] = List[Group]()
+          ): List[Group] ={
 
     val result = service.groups()
       .list()
-      .setDomain("eckerd.edu")
-      .setMaxResults(500)
+      .setDomain(domain)
+      .setMaxResults(resultsPerPage)
       .setPageToken(pageToken)
       .execute()
 
@@ -40,7 +42,7 @@ object groups {
 
     val nextPageToken = result.getNextPageToken
 
-    if (nextPageToken != null && result.getGroups != null) list(service, nextPageToken, myList) else myList
+    if (nextPageToken != null && result.getGroups != null) list(service, domain, resultsPerPage, nextPageToken, myList) else myList
   }
 
   /**
