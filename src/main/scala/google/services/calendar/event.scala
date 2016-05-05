@@ -1,7 +1,6 @@
 package google.services.calendar
 
 import com.google.api.client.util.DateTime
-import com.google.api.services.calendar.{Calendar, CalendarScopes}
 import com.google.api.services.calendar.model.{Event, EventAttendee, EventDateTime}
 
 import scala.collection.JavaConverters._
@@ -9,9 +8,10 @@ import scala.collection.JavaConverters._
 /**
   * Created by davenpcm on 5/3/16.
   */
-object event {
+class event(calendar: Calendar) {
+  val service = calendar.calendar
 
-  def list(service: Calendar): List[Event] = {
+  def list: List[Event] = {
     val now = new DateTime(System.currentTimeMillis())
     val events = service.events.list("primary")
       .setMaxResults(500)
@@ -24,7 +24,7 @@ object event {
     events.asScala.toList
   }
 
-  def put(service: Calendar, event: Event, calendar: String = "primary", sendNotifications: Boolean = true): Event = {
+  def put(event: Event, calendar: String = "primary", sendNotifications: Boolean = true): Event = {
     service.events()
       .insert(calendar, event)
       .setSendNotifications(sendNotifications)

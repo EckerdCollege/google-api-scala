@@ -1,13 +1,13 @@
 package scripts
 
-import com.google.api.services.admin.directory.Directory
+
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
 
+import google.services.admin.directory.Directory
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import google.services.admin.directory.groups._
 import persistence.entities.representations.GroupMaster_R
 import persistence.entities.tables.GROUP_MASTER
 
@@ -24,10 +24,11 @@ object GoogleUpdateGroupMaster extends App {
     val db = modules.db
     val GROUP_MASTER_TABLEQUERY = TableQuery[GROUP_MASTER]
 
+
     // Create Table or Silently Fail
     Try(Await.result(db.run(GROUP_MASTER_TABLEQUERY.schema.create), Duration.Inf))
 
-    val currentGroupsinGoogle = list(service)
+    val currentGroupsinGoogle = service.groups.list()
 
     val existsTupleFuture = Future.sequence(currentGroupsinGoogle.par.map(group =>
       db.run(GROUP_MASTER_TABLEQUERY.withFilter(a => a.id === group.getId).result)

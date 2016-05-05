@@ -9,7 +9,6 @@ libraryDependencies ++= List(
   "org.slf4j" % "slf4j-nop" % "1.7.10",
   "com.h2database" % "h2" % "1.4.187",
   "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-  "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % "test",
   "com.typesafe.slick" %% "slick-extensions" % "3.1.0",
   "com.typesafe.slick" %% "slick-hikaricp" % "3.1.0",
   "com.google.api-client" % "google-api-client" % "1.21.0",
@@ -22,7 +21,6 @@ libraryDependencies ++= List(
 
 
 unmanagedBase := baseDirectory.value / ".lib"
-unmanagedResourceDirectories in Compile += baseDirectory.value / "src" / "resources"
 
 resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/"
 fork in run := true

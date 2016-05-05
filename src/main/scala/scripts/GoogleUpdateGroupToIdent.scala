@@ -1,6 +1,6 @@
 package scripts
 
-import com.google.api.services.admin.directory.Directory
+
 import com.google.api.services.admin.directory.model.Member
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
@@ -8,7 +8,7 @@ import utils.persistence.PersistenceModuleImpl
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import google.services.admin.directory._
+import google.services.admin.directory.Directory
 import persistence.entities.representations.Group2Ident_R
 import persistence.entities.tables.GROUPTOIDENT
 
@@ -32,14 +32,14 @@ object GoogleUpdateGroupToIdent {
     // Create Table or Silently Fail
     Try(Await.result(db.run(group2IdentTableQuery.schema.create), Duration.Inf))
 
-    val currentGroups = groups.list(service)
+    val currentGroups = service.groups.list()
 
     val groupidents = currentGroups.map(group =>
       GroupIdent(group.getId, group.getName, group.getEmail, group.getDirectMembersCount, group.getDescription)
     )
 
     val group2Members = groupidents.par.map(ident =>
-      members.list(ident.email, service).fold(e => {println(e); List[Member]()}, list=> list)
+      service.members.list(ident.email).fold(e => {println(e); List[Member]()}, list=> list)
         .map(member =>
           (Group2Ident_R(ident.id, member.getId, "", member.getRole, member.getType),
             Await.result(db.run(group2IdentTableQuery.withFilter(rec =>

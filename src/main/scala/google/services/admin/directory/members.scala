@@ -1,7 +1,6 @@
 package google.services.admin.directory
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException
-import com.google.api.services.admin.directory.Directory
 import com.google.api.services.admin.directory.model.{Member, Members}
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
@@ -10,7 +9,8 @@ import scala.util.{Failure, Success, Try}
 /**
   * Created by davenpcm on 5/3/16.
   */
-object members {
+class members(directory: Directory) {
+  val service = directory.directory
 
   /**
     * The function takes a groupKey to return all members of the group. Current Error Handling will terminate on an error
@@ -19,18 +19,15 @@ object members {
     *
     * @param groupKey This is either the unique group id or the group email address. Which specifies which group to
     *                 return the members of
-    * @param service This is the service we will be utilizing to get the members. It is initialized as a Parameter as
-    *                that way it is only initialized on entry to the loop and then the same directory is used each time
     * @param pageToken This is the page token that shows where we are in the pages.
     * @param members This is the growing list of group members
     * @return A list of all members of the group
     */
   @tailrec
-  def list(groupKey: String,
-                          service: Directory,
-                          pageToken: String = "",
-                          members: List[Member] = List[Member]()
-                         ): Either[Throwable, List[Member]] = {
+  final def list(groupKey: String,
+           pageToken: String = "",
+           members: List[Member] = List[Member]()
+          ): Either[Throwable, List[Member]] = {
 
     val resultTry = Try(
       service.members()
@@ -51,16 +48,14 @@ object members {
 
         val nextPageToken = result.getNextPageToken
 
-        if (nextPageToken != null && result.getMembers != null) list(groupKey, service, nextPageToken, myList) else Right(myList)
+        if (nextPageToken != null && result.getMembers != null) list(groupKey, nextPageToken, myList) else Right(myList)
 
       case Failure(ex) => Left(ex)
     }
 
   }
 
-  def add(groupKey: String, newMemberId: String, role: String,
-                     service: Directory
-                    ): Member = {
+  def add(groupKey: String, newMemberId: String, role: String): Member = {
 
     val newMember = new Member
     newMember.setId(newMemberId)
@@ -70,10 +65,7 @@ object members {
     InsertedMember
   }
 
-  def remove(groupKey: String,
-             userId: String,
-             service: Directory
-            ): Unit = {
+  def remove(groupKey: String, userId: String): Unit = {
     service.members().delete(groupKey, userId).execute()
   }
 

@@ -2,12 +2,11 @@ package scripts
 
 import java.sql.Timestamp
 
-import com.google.api.services.admin.directory.Directory
+import google.services.admin.directory.Directory
 import com.google.api.services.admin.directory.model.User
 import persistence.entities.representations.{GOBUMAP_R, GOREMAL_R, GoogleIdentity}
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
-import google.services.admin.directory.users._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -303,7 +302,7 @@ object GoogleUpdateGobumap {
       GoogleIdentity(user.getId, user.getPrimaryEmail)
     }
 
-    val googleIdentitiesSets = transformAllGoogleUsers[GoogleIdentity](service)(UserToGoogleIdent)
+    val googleIdentitiesSets = service.users.transformAllGoogleUsers[GoogleIdentity]()(UserToGoogleIdent)
 
     googleIdentitiesSets
   }

@@ -31,7 +31,7 @@ class serviceSpec extends FlatSpec with Matchers {
     GmailScopes.GMAIL_COMPOSE
   )
 
-  val service = google.services.service(serviceAccountEmail,
+  val service = google.services.Service(serviceAccountEmail,
     adminImpersonatedEmail,
     credentialFilePath,
     applicationName,

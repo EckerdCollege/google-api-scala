@@ -29,7 +29,7 @@ class groupsSpec extends FlatSpec with Matchers {
     GmailScopes.GMAIL_COMPOSE
   )
 
-  val service = google.services.service(serviceAccountEmail,
+  val service = google.services.Service(serviceAccountEmail,
     adminImpersonatedEmail,
     credentialFilePath,
     applicationName,
@@ -38,8 +38,11 @@ class groupsSpec extends FlatSpec with Matchers {
 
   val Directory = service.Directory
 
+  val list = Directory.groups.list()
+
+
   "A Directory utilizing groups" should "return a List[Group]" in {
-    google.services.admin.directory.groups.list(Directory) shouldBe a[List[Group]]
+     list shouldBe a[List[Group]]
   }
 
 }

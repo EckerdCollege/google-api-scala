@@ -4,7 +4,6 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.gmail.GmailScopes
 import com.typesafe.config.ConfigFactory
-import google.services.drive.files._
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -43,7 +42,7 @@ object CommandLine extends App{
 //
 //  println(credential.getServiceAccountId)
 
-    val partial = google.services.service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
+    val partial = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
 
     val me = partial("davenpcm@eckerd.edu")
     val admin = partial(adminImpersonatedEmail)

@@ -1,15 +1,16 @@
 package google.services.drive
 
-import com.google.api.services.drive.Drive
+
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.PermissionList
 import scala.collection.JavaConverters._
 /**
   * Created by davenpcm on 5/4/16.
   */
-object permissions {
+class permissions(drive: Drive) {
+  val service = drive.drive
 
-  def list(service: Drive, fileId: String): List[Permission] = {
+  def list(fileId: String): List[Permission] = {
     val result = service.permissions().list(fileId)
       .execute()
 
@@ -20,15 +21,15 @@ object permissions {
     typedList
   }
 
-  def get(service: Drive, fileId: String, permissionId: String): Permission = {
+  def get(fileId: String, permissionId: String): Permission = {
     service.permissions().get(fileId, permissionId).execute()
   }
 
-  def delete(service: Drive, fileId: String, permissionId: String): Unit = {
+  def delete(fileId: String, permissionId: String): Unit = {
     service.permissions().delete(fileId, permissionId).execute()
   }
 
-  def create(service: Drive,
+  def create(
              fileId: String,
              permission: Permission,
              sendNotificationEmail: Boolean,

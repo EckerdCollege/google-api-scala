@@ -1,17 +1,15 @@
 package scripts
 import java.io.FileOutputStream
 
-import com.google.api.services.admin.directory.{Directory, DirectoryScopes}
+import google.services.admin.directory.Directory
 import com.google.api.services.admin.directory.model.User
 import com.google.common.io.BaseEncoding
 import persistence.entities.representations.Image
-import google.services.admin.directory.photos._
-import google.services.admin.directory.users._
 
 /**
   * Created by davenpcm on 4/27/16.
   */
-object GooglePhotos extends App {
+object GooglePhotos {
 
   /**
     * This function takes a user object and creates an image at the location specified or returns None if there was no
@@ -21,6 +19,8 @@ object GooglePhotos extends App {
     * @return A tuple mapping the id to the option image created by the process.
     */
   def getGoogleImage(outputFolder: String, user: User, service: Directory): (User, Option[Image]) = {
+
+
     val id = user.getId
     /**
       * Simple Parse to Make Sure the Folder String is Properly Ended with a Slash
@@ -67,7 +67,7 @@ object GooglePhotos extends App {
       * @return An Option of an Image if it Exists
       */
     def convertUserToImage(user: User, service: Directory): Option[Image] = {
-      val userPhoto = get(user.getId, service)
+      val userPhoto = service.photos.get(user.getId)
       userPhoto match {
         case Right(photo) =>
           val extension = mimeTypeToExtension(photo.getMimeType)
@@ -105,7 +105,7 @@ object GooglePhotos extends App {
     */
   def getAllGoogleImages( outputFolder: String, service: Directory): Seq[(User, Option[Image])] = {
 
-    val parImages = list(service)
+    val parImages = service.users.list()
       .par
       .map(getGoogleImage(outputFolder, _, service))
 

@@ -1,7 +1,6 @@
 package google.services.admin.directory
 
 import com.google.api.services.admin.directory.model.{User, Users}
-import com.google.api.services.admin.directory.Directory
 
 import scala.annotation.tailrec
 import collection.JavaConverters._
@@ -12,22 +11,21 @@ import scala.util.Failure
 /**
   * Created by davenpcm on 5/3/16.
   */
-object users {
+class users(directory: Directory) {
+
+  val service = directory.directory
 
   /**
     * This is a simple user accumulation function that collects all users in eckerd. It does no additional modification
     * so that you can easily move from users to whatever other form you would like and do those pieces of data
     * manipulation after all the users have been returned.
     *
-    * @param service A directory to check
     * @param pageToken A page token which indicates where you are in the sequence of pages of users
     * @param users A List Used For Recursive Accumulation through the function. We build a large list of users
     * @return
     */
   @tailrec
-  def list(service: Directory,
-                   pageToken: String = "",
-                   users: List[User] = List[User]()): List[User] = {
+  final def list(pageToken: String = "", users: List[User] = List[User]()): List[User] = {
 
     val result = service.users()
       .list()
@@ -45,18 +43,16 @@ object users {
     val myList = typedList ::: users
 
     val nextPageToken = result.getNextPageToken
-    if (nextPageToken != null && result.getUsers != null) list(service, nextPageToken, myList) else myList
+    if (nextPageToken != null && result.getUsers != null) list(nextPageToken, myList) else myList
 
   }
 
   /**
     *  This returns the user from a string. Be Aware this user
     * @param identifier The identifier used to get the user
-    * @param service The service to use to to find the user
     * @return
     */
-  def getUser(identifier: String,
-              service: Directory): Either[Throwable, User] = {
+  def getUser(identifier: String): Either[Throwable, User] = {
     val attempt = Try(service.users().get(identifier).execute())
     attempt match {
       case Success(member)=> Right(member)
@@ -69,7 +65,6 @@ object users {
     * This function is a Type free implementation that allows you to tell you what type you are expecting as a return
     * and it will fully type check that you are getting the type you want back.
     *
-    * @param service This is the directory to be returned
     * @param pageToken This is a page token to show where in the series of pages you are.
     * @param transformed A List of Type T, is Initialized to an Empty List that is expanded recursively through each
     *                    of the pages
@@ -78,7 +73,7 @@ object users {
     * @return Returns a List of Type T
     */
   @tailrec
-  def transformAllGoogleUsers[T](service: Directory,
+  final def transformAllGoogleUsers[T](
                                          pageToken: String = "",
                                          transformed: => List[T] = List[T]()
                                         )(f: User => T): List[T] = {
@@ -101,7 +96,7 @@ object users {
 
     val nextPageToken = result.getNextPageToken
 
-    if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(service, nextPageToken, list)(f) else list
+    if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(nextPageToken, list)(f) else list
   }
 
 

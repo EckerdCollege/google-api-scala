@@ -3,12 +3,14 @@ package google.services
 import com.google.api.client.googleapis.auth.oauth2.{GoogleClientSecrets, GoogleCredential}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
-
+import google.services.admin.directory.Directory
+import google.services.calendar.Calendar
+import google.services.drive.Drive
 
 /**
   * Created by davenpcm on 5/3/16.
   */
-class service( serviceAccountEmail: String,
+case class Service( serviceAccountEmail: String,
                impersonatedEmail: String,
                credentialFilePath: String,
                applicationName: String,
@@ -25,35 +27,20 @@ class service( serviceAccountEmail: String,
     *
     * @return A Google Directory Object which can be used to look through Admin Directory Information
     */
-  def Directory: com.google.api.services.admin.directory.Directory = {
-    val directory = new com.google.api.services.admin.directory.Directory.Builder(httpTransport, jsonFactory, credential)
-      .setApplicationName(applicationName)
-      .setHttpRequestInitializer(credential)
-      .build()
-
-    directory
+  def Directory: Directory = {
+    new Directory(this)
   }
 
   /**
     * This function generates a Calendar Service to use To Manipulate Google Calendar
     * @return A google Calendar Service to
     */
-  def Calendar: com.google.api.services.calendar.Calendar = {
-    val calendar = new com.google.api.services.calendar.Calendar.Builder(httpTransport, jsonFactory, credential)
-      .setApplicationName(applicationName)
-      .setHttpRequestInitializer(credential)
-      .build()
-
-    calendar
+  def Calendar: Calendar = {
+    new Calendar(this)
   }
 
-  def Drive: com.google.api.services.drive.Drive = {
-    val drive = new com.google.api.services.drive.Drive.Builder(httpTransport, jsonFactory, credential)
-      .setApplicationName(applicationName)
-      .setHttpRequestInitializer(credential)
-      .build()
-
-    drive
+  def Drive: Drive = {
+    new Drive(this)
   }
 
   private def getCredential(serviceAccountEmail: String,
@@ -99,19 +86,12 @@ class service( serviceAccountEmail: String,
 
 }
 
-object service {
-  def apply(serviceAccountEmail: String,
-            impersonatedEmail: String,
-            credentialFilePath: String,
-            applicationName: String,
-            scopes: List[String]): service = {
-    new service(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
-  }
+object Service {
 
   def apply(serviceAccountEmail: String,
               credentialFilePath: String,
               applicationName: String,
-              scopes: List[String])(impersonator: String): service = {
+              scopes: List[String])(impersonator: String): Service = {
       apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, scopes)
   }
 }
