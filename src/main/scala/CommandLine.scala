@@ -4,7 +4,6 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.gmail.GmailScopes
 import com.typesafe.config.ConfigFactory
-import google.services.service._
 import google.services.drive.files._
 
 /**
@@ -32,16 +31,24 @@ object CommandLine extends App{
   val applicationName = config.getString("applicationName")
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
-  val credential = getCredential(serviceAccountEmail,
-    "davenpcm@eckerd.edu",
+  val service = google.services.service()
+
+  val credential = service.getCredential(serviceAccountEmail,
+    adminImpersonatedEmail,
     credentialFilePath,
     applicationName,
     ListScopes
   )
-  val service = getCalendar(credential, applicationName)
 
-  val event = google.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
-  val finalevent = google.services.calendar.event.put(service, event)
+  println(credential.getServiceAccountId)
+
+
+
+
+//  val service = getCalendar(credential, applicationName)
+//
+//  val event = google.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
+//  val finalevent = google.services.calendar.event.put(service, event)
 //  val service = getDrive(credential, applicationName)
 
 //  val these = google.services.drive.files.list(service)

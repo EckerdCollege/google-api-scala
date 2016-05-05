@@ -8,7 +8,7 @@ import com.google.api.client.json.jackson2.JacksonFactory
 /**
   * Created by davenpcm on 5/3/16.
   */
-object service {
+class service {
   /**
     * This function is currently configured for a service account to interface with the school. It has been granted
     * explicitly these grants so to change the scope these need to be implemented in Google first.
@@ -92,4 +92,10 @@ object service {
     credential
   }
 
+}
+
+object service {
+  def apply(): service = {
+    new service
+  }
 }

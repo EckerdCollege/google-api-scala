@@ -3,7 +3,6 @@ package google.services.calendar
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.{Calendar, CalendarScopes}
 import com.google.api.services.calendar.model.{Event, EventAttendee, EventDateTime}
-import google.services.service._
 
 import scala.collection.JavaConverters._
 
