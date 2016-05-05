@@ -107,4 +107,11 @@ object service {
             scopes: List[String]): service = {
     new service(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
   }
+
+  def apply(serviceAccountEmail: String,
+              credentialFilePath: String,
+              applicationName: String,
+              scopes: List[String])(impersonator: String): service = {
+      apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, scopes)
+  }
 }

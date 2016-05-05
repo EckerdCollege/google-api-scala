@@ -31,17 +31,25 @@ object CommandLine extends App{
   val applicationName = config.getString("applicationName")
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
-  val service = google.services.service(
-    serviceAccountEmail,
-    adminImpersonatedEmail,
-    credentialFilePath,
-    applicationName,
-    ListScopes
-  )
+//  val service = google.services.service(
+//    serviceAccountEmail,
+//    adminImpersonatedEmail,
+//    credentialFilePath,
+//    applicationName,
+//    ListScopes
+//  )
 
-  val credential = service.credential
+//  val credential = service.credential
+//
+//  println(credential.getServiceAccountId)
 
-  println(credential.getServiceAccountId)
+    val partial = google.services.service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
+
+    val me = partial("davenpcm@eckerd.edu")
+    val admin = partial(adminImpersonatedEmail)
+
+    println(me.credential)
+    println(admin.credential)
 
 
 
