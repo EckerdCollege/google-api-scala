@@ -6,7 +6,6 @@ import com.google.api.services.admin.directory.model.User
 import com.google.common.io.BaseEncoding
 import persistence.entities.representations.Image
 import google.services.admin.directory.photos._
-import google.services.service._
 import google.services.admin.directory.users._
 
 /**

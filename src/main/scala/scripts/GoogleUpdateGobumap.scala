@@ -11,7 +11,6 @@ import google.services.admin.directory.users._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import google.services.service._
 
 /**
   * Created by davenpcm on 4/15/2016.

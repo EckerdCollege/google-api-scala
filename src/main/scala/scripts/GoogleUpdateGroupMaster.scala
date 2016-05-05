@@ -7,7 +7,6 @@ import utils.persistence.PersistenceModuleImpl
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
-import google.services.service._
 import google.services.admin.directory.groups._
 import persistence.entities.representations.GroupMaster_R
 import persistence.entities.tables.GROUP_MASTER
