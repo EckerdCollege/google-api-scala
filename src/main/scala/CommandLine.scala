@@ -43,10 +43,11 @@ object CommandLine extends App{
 //
 //  println(credential.getServiceAccountId)
 
-    val partial = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
+    val pluggableService = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
 
-    val adminService = partial(adminImpersonatedEmail)
-
+//    val adminService = partial(adminImpersonatedEmail)
+    val files = pluggableService("davenpcm@eckerd.edu").Drive.files.list()
+    files.foreach(println)
 
 
 
@@ -104,8 +105,8 @@ object CommandLine extends App{
 //    val download = google.services.drive.files.download(service, path, file)
 //    println(download)
 
-  val directory = adminService.Directory
-  val photos = GooglePhotos.getAllGoogleImages("/home/davenpcm/Pictures/Student", directory)
+//  val directory = adminService.Directory
+//  val photos = GooglePhotos.getAllGoogleImages("/home/davenpcm/Pictures/Student", directory)
 
 //  val images = scripts.GooglePhotos.getAllGoogleImages("/home/davenpcm/Pictures/Student", directory)
 //  images.foreach(println)
@@ -115,7 +116,7 @@ object CommandLine extends App{
 //  gobumapResults.foreach(println)
 
 //  val service = getDirectory(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
-//  val update = scripts.GoogleUpdateGroupMaster.update(service)
+//  val update = scripts.GoogleUpdateGroupMaster.update(directory)
 //  update foreach println
 
 //  val service = getDirectory(DirectoryScopes.ADMIN_DIRECTORY_GROUP)

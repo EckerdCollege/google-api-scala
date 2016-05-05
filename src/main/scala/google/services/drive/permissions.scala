@@ -1,14 +1,14 @@
 package google.services.drive
 
 
-import com.google.api.services.drive.model.Permission
+import models._
 import com.google.api.services.drive.model.PermissionList
 import scala.collection.JavaConverters._
 /**
   * Created by davenpcm on 5/4/16.
   */
 class permissions(drive: Drive) {
-  val service = drive.drive
+  implicit val service = drive.drive
 
   def list(fileId: String): List[Permission] = {
     val result = service.permissions().list(fileId)
@@ -16,7 +16,7 @@ class permissions(drive: Drive) {
 
     val typedList = List[PermissionList](result)
       .map(permissions => permissions.getPermissions.asScala.toList)
-      .foldLeft(List[Permission]())((acc, listGroups) => listGroups ::: acc)
+      .foldLeft(List[Permission]())((acc, listGroups) => listGroups.map(Permission.fromGoogleApi) ::: acc)
 
     typedList
   }
