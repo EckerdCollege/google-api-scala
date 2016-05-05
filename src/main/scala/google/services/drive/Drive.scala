@@ -1,6 +1,7 @@
 package google.services.drive
 
 import google.services.Service
+import language.implicitConversions
 
 /**
   * Created by davenpcm on 5/5/16.
@@ -13,4 +14,9 @@ case class Drive(service: Service) {
 
   val files = new files(this)
 
+}
+object Drive {
+  implicit def toGoogleApi(drive: Drive): com.google.api.services.drive.Drive = {
+    drive.drive
+  }
 }
