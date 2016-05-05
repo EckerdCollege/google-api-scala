@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 /**
   * Created by davenpcm on 5/3/16.
   */
-class groups(directory: Directory) {
+case class groups(directory: Directory) {
   val service = directory.directory
 
   /**

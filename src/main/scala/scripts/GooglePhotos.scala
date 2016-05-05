@@ -75,7 +75,7 @@ object GooglePhotos {
           val parsedFolder = parseOutputFolder(outputFolder)
           val image = Image(s"$parsedFolder$id$extension", byteArray)
           Some(image)
-        case Left(error) => None
+        case Left(error) => {println(error); None}
       }
     }
 
@@ -105,11 +105,14 @@ object GooglePhotos {
     */
   def getAllGoogleImages( outputFolder: String, service: Directory): Seq[(User, Option[Image])] = {
 
-    val parImages = service.users.list()
-      .par
-      .map(getGoogleImage(outputFolder, _, service))
+    val users = service.users.list()
 
-    parImages.seq
+    val photos = users
+        .par.map(user => getGoogleImage(outputFolder, user, service))
+
+    photos.foreach(tuple => create(tuple._2))
+
+    photos.seq
   }
 
 

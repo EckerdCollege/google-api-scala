@@ -21,27 +21,10 @@ case class Service( serviceAccountEmail: String,
   val jsonFactory = new JacksonFactory
   val credential = getCredential(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
 
-  /**
-    * This function is currently configured for a service account to interface with the school. It has been granted
-    * explicitly these grants so to change the scope these need to be implemented in Google first.
-    *
-    * @return A Google Directory Object which can be used to look through Admin Directory Information
-    */
-  def Directory: Directory = {
-    new Directory(this)
-  }
+  lazy val Directory = new Directory(this)
+  lazy val Calendar = new Calendar(this)
+  lazy val Drive = new Drive(this)
 
-  /**
-    * This function generates a Calendar Service to use To Manipulate Google Calendar
-    * @return A google Calendar Service to
-    */
-  def Calendar: Calendar = {
-    new Calendar(this)
-  }
-
-  def Drive: Drive = {
-    new Drive(this)
-  }
 
   private def getCredential(serviceAccountEmail: String,
                     impersonatedEmail: String,

@@ -4,6 +4,7 @@ import com.google.api.services.drive.DriveScopes
 import com.google.api.services.drive.model.Permission
 import com.google.api.services.gmail.GmailScopes
 import com.typesafe.config.ConfigFactory
+import scripts.GooglePhotos
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -44,11 +45,9 @@ object CommandLine extends App{
 
     val partial = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
 
-    val me = partial("davenpcm@eckerd.edu")
-    val admin = partial(adminImpersonatedEmail)
+    val adminService = partial(adminImpersonatedEmail)
 
-    println(me.credential)
-    println(admin.credential)
+
 
 
 
@@ -105,7 +104,9 @@ object CommandLine extends App{
 //    val download = google.services.drive.files.download(service, path, file)
 //    println(download)
 
-//  val directory = getDirectory(DirectoryScopes.ADMIN_DIRECTORY_USER)
+  val directory = adminService.Directory
+  val photos = GooglePhotos.getAllGoogleImages("/home/davenpcm/Pictures/Student", directory)
+
 //  val images = scripts.GooglePhotos.getAllGoogleImages("/home/davenpcm/Pictures/Student", directory)
 //  images.foreach(println)
 

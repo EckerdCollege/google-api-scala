@@ -52,7 +52,7 @@ class users(directory: Directory) {
     * @param identifier The identifier used to get the user
     * @return
     */
-  def getUser(identifier: String): Either[Throwable, User] = {
+  def get(identifier: String): Either[Throwable, User] = {
     val attempt = Try(service.users().get(identifier).execute())
     attempt match {
       case Success(member)=> Right(member)
