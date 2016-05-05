@@ -8,55 +8,60 @@ import com.google.api.client.json.jackson2.JacksonFactory
 /**
   * Created by davenpcm on 5/3/16.
   */
-class service {
+class service( serviceAccountEmail: String,
+               impersonatedEmail: String,
+               credentialFilePath: String,
+               applicationName: String,
+               scopes: List[String]
+             ) {
+
+  val httpTransport = new NetHttpTransport
+  val jsonFactory = new JacksonFactory
+  val credential = getCredential(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
+
   /**
     * This function is currently configured for a service account to interface with the school. It has been granted
     * explicitly these grants so to change the scope these need to be implemented in Google first.
     *
     * @return A Google Directory Object which can be used to look through Admin Directory Information
     */
-  def getDirectory(googleCredential: GoogleCredential,
-                   applicationName: String): com.google.api.services.admin.directory.Directory = {
-    val httpTransport = new NetHttpTransport
-    val jsonFactory = new JacksonFactory
-    val directory = new com.google.api.services.admin.directory.Directory.Builder(httpTransport, jsonFactory, googleCredential)
+  def Directory: com.google.api.services.admin.directory.Directory = {
+    val directory = new com.google.api.services.admin.directory.Directory.Builder(httpTransport, jsonFactory, credential)
       .setApplicationName(applicationName)
-      .setHttpRequestInitializer(googleCredential)
+      .setHttpRequestInitializer(credential)
       .build()
 
     directory
   }
 
-  def getCalendar(googleCredential: GoogleCredential, applicationName: String): com.google.api.services.calendar.Calendar = {
-    val httpTransport = new NetHttpTransport
-    val jsonFactory = new JacksonFactory
-    val calendar = new com.google.api.services.calendar.Calendar.Builder(httpTransport, jsonFactory, googleCredential)
+  /**
+    * This function generates a Calendar Service to use To Manipulate Google Calendar
+    * @return A google Calendar Service to
+    */
+  def Calendar: com.google.api.services.calendar.Calendar = {
+    val calendar = new com.google.api.services.calendar.Calendar.Builder(httpTransport, jsonFactory, credential)
       .setApplicationName(applicationName)
-      .setHttpRequestInitializer(googleCredential)
+      .setHttpRequestInitializer(credential)
       .build()
 
     calendar
   }
 
-  def getDrive(googleCredential: GoogleCredential, applicationName: String): com.google.api.services.drive.Drive = {
-    val httpTransport = new NetHttpTransport
-    val jsonFactory = new JacksonFactory
-    val drive = new com.google.api.services.drive.Drive.Builder(httpTransport, jsonFactory, googleCredential)
+  def Drive: com.google.api.services.drive.Drive = {
+    val drive = new com.google.api.services.drive.Drive.Builder(httpTransport, jsonFactory, credential)
       .setApplicationName(applicationName)
-      .setHttpRequestInitializer(googleCredential)
+      .setHttpRequestInitializer(credential)
       .build()
 
     drive
   }
 
-  def getCredential(serviceAccountEmail: String,
+  private def getCredential(serviceAccountEmail: String,
                     impersonatedEmail: String,
                     credentialFilePath: String,
                     applicationName: String,
                     scopes: List[String]): GoogleCredential = {
     import scala.collection.JavaConverters._
-    val httpTransport = new NetHttpTransport
-    val jsonFactory = new JacksonFactory
 
     val initCredential = new GoogleCredential.Builder()
       .setTransport(httpTransport)
@@ -95,7 +100,11 @@ class service {
 }
 
 object service {
-  def apply(): service = {
-    new service
+  def apply(serviceAccountEmail: String,
+            impersonatedEmail: String,
+            credentialFilePath: String,
+            applicationName: String,
+            scopes: List[String]): service = {
+    new service(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
   }
 }

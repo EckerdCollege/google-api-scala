@@ -15,7 +15,11 @@ import scala.collection.JavaConverters._
 
 class serviceSpec extends FlatSpec with Matchers {
 
-  val service = google.services.service()
+  val config = ConfigFactory.load().getConfig("googleTest")
+  val serviceAccountEmail = config.getString("email")
+  val credentialFilePath = config.getString("pkcs12FilePath")
+  val applicationName = config.getString("applicationName")
+  val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
   val ListScopes = List(
     DirectoryScopes.ADMIN_DIRECTORY_USER,
@@ -27,22 +31,17 @@ class serviceSpec extends FlatSpec with Matchers {
     GmailScopes.GMAIL_COMPOSE
   )
 
-  val config = ConfigFactory.load().getConfig("googleTest")
-  val serviceAccountEmail = config.getString("email")
-  val credentialFilePath = config.getString("pkcs12FilePath")
-  val applicationName = config.getString("applicationName")
-  val adminImpersonatedEmail = config.getString("impersonatedEmail")
-
-  val credential = service.getCredential(
-    serviceAccountEmail,
+  val service = google.services.service(serviceAccountEmail,
     adminImpersonatedEmail,
     credentialFilePath,
     applicationName,
     ListScopes
   )
 
+  val credential = service.credential
+
   "A Google Credential" should "be returned from getCredential" in {
-    credential shouldBe a[GoogleCredential]
+    credential shouldBe a [GoogleCredential]
   }
 
   it should "have the service account Email from the Configuration" in {
