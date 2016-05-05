@@ -16,7 +16,7 @@ import scala.util.Try
 /**
   * Created by davenpcm on 4/21/2016.
   */
-object GoogleUpdateGroupMaster extends App {
+object GoogleUpdateGroupMaster {
 
   def update(service: Directory) = {
     val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
@@ -26,7 +26,7 @@ object GoogleUpdateGroupMaster extends App {
 
 
     // Create Table or Silently Fail
-    Try(Await.result(db.run(GROUP_MASTER_TABLEQUERY.schema.create), Duration.Inf))
+    Await.result(db.run(GROUP_MASTER_TABLEQUERY.schema.create), Duration.Inf)
 
     val currentGroupsinGoogle = service.groups.list()
 
