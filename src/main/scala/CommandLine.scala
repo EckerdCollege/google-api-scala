@@ -24,6 +24,9 @@ object CommandLine extends App{
 
 
   val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
+  val groups = adminDirectory.groups.list().par.foreach(g =>
+    println(adminDirectory.members.list(g.id.get))
+  )
 //  val user = adminDirectory.users.create("TestUserName", "TestFamilyName", "usercreatetest0000001@test.eckerd.edu", "testpassword01")
 //  println(user)
 //  val changeduser = user.copy(name = Name("ChangedTestUserName", "ChangedTestFamilyName"))
@@ -31,13 +34,17 @@ object CommandLine extends App{
 //  val permanentlyChangedUser =  adminDirectory.users.update(changeduser)
 //  println(permanentlyChangedUser)
 //  adminDirectory.users.list().foreach(println)
-  val user = adminDirectory.users.get("usercreatetest0000001@test.eckerd.edu")
-  println(user)
-  val newUser = user match {
-    case Right(user) => Some(adminDirectory.users.update(user.copy(suspended = true)))
-    case _ => None
-  }
-  println(newUser)
+//  val user = adminDirectory.users.get("usercreatetest0000001@test.eckerd.edu")
+//  println(user)
+//  val newUser = user match {
+//    case Right(user) => Some(
+//      adminDirectory.users.update(user.copy(suspended = true)
+//      ))
+//    case _ => None
+//  }
+//  println(newUser)
+
+//  println(List(1,2,3).contains(2))
 
 //    val drive = pluggableService("davenpcm@eckerd.edu").Drive
 //    val fileList = drive.files.list()

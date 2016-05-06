@@ -1,7 +1,7 @@
 package scripts
 
 
-import com.google.api.services.admin.directory.model.Member
+import google.services.admin.directory.models.Member
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
 

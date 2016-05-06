@@ -1,7 +1,7 @@
 package google.services.admin.directory
 
-import com.google.api.client.googleapis.json.GoogleJsonResponseException
-import com.google.api.services.admin.directory.model.{Member, Members}
+import google.services.admin.directory.models.Member
+import com.google.api.services.admin.directory.model.Members
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
@@ -28,7 +28,8 @@ class members(directory: Directory) {
            pageToken: String = "",
            members: List[Member] = List[Member]()
           ): Either[Throwable, List[Member]] = {
-
+  import scala.collection.JavaConverters._
+    
     val resultTry = Try(
       service.members()
         .list(groupKey)
@@ -36,13 +37,13 @@ class members(directory: Directory) {
         .setPageToken(pageToken)
         .execute()
     )
+    
 
     resultTry match {
       case Success(result) =>
         val typedList = List[Members](result)
-          .map(members => Option(members.getMembers))
-          .map{ case Some(member) => member.asScala.toList case None => List[Member]() }
-          .foldLeft(List[Member]())((acc, listMembers) => listMembers ::: acc)
+          .map(members => members.getMembers.asScala.toList)
+          .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(Member.apply) ::: acc)
 
         val myList = typedList ::: members
 
