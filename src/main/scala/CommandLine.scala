@@ -20,9 +20,9 @@ object CommandLine extends App{
     GmailScopes.GMAIL_COMPOSE
   )
 
-//  val UserScope = List(DirectoryScopes.ADMIN_DIRECTORY_USER)
+  val UserScope = DirectoryScopes.ADMIN_DIRECTORY_USER
 //  val GroupScope = List(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
-//  val DriveScope = List(DriveScopes.DRIVE)
+  val DriveScope = DriveScopes.DRIVE
 //  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
 
   val config = ConfigFactory.load().getConfig("google")
@@ -43,16 +43,16 @@ object CommandLine extends App{
 //
 //  println(credential.getServiceAccountId)
 
-    val pluggableService = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
+    val pluggableService = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, DriveScope)(_)
 
 //    val adminService = partial(adminImpersonatedEmail)
     val drive = pluggableService("davenpcm@eckerd.edu").Drive
     val files = drive.files.list()
 
-    val randomFiles = files.filter(_.name.endsWith(".pdf")).take(10)
+    val randomFiles = files.filter(_.name.endsWith(".jpg")).take(400)
     val Path = "/home/davenpcm/Downloads/temp/"
     randomFiles.foreach(println)
-    randomFiles.foreach(drive.files.download(Path, _))
+    randomFiles.par.foreach(drive.files.download(Path, _))
 
 
 
