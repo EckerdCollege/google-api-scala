@@ -1,35 +1,38 @@
-import com.google.api.services.admin.directory.DirectoryScopes
-import com.google.api.services.calendar.CalendarScopes
-import com.google.api.services.drive.DriveScopes
-import com.google.api.services.drive.model.Permission
-import com.google.api.services.gmail.GmailScopes
+
 import com.typesafe.config.ConfigFactory
 import scripts.GooglePhotos
+import google.services.Service
+import google.services.Scopes.DRIVE
+import google.services.Scopes.ADMIN_DIRECTORY
 
 /**
   * Created by davenpcm on 5/3/16.
   */
 object CommandLine extends App{
-  val ListScopes = List(
-    DirectoryScopes.ADMIN_DIRECTORY_USER,
-    DirectoryScopes.ADMIN_DIRECTORY_GROUP,
-    DirectoryScopes.ADMIN_DIRECTORY_GROUP_MEMBER,
-    CalendarScopes.CALENDAR,
-    DriveScopes.DRIVE,
-    DriveScopes.DRIVE_APPDATA,
-    GmailScopes.GMAIL_COMPOSE
-  )
 
-  val UserScope = DirectoryScopes.ADMIN_DIRECTORY_USER
-//  val GroupScope = List(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
-  val DriveScope = DriveScopes.DRIVE
-//  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
 
+  val scope = ADMIN_DIRECTORY
   val config = ConfigFactory.load().getConfig("google")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
   val applicationName = config.getString("applicationName")
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
+
+  val pluggableService = Service(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
+
+//  val drive = pluggableService("davenpcm@eckerd.edu").Drive
+//  val fileList = drive.files.list()
+//  fileList.par.foreach(_.download("/home/davenpcm/Downloads/temp/", drive))
+
+  val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
+  val files = adminDirectory.users.list().foreach(println)
+
+//  val UserScope = DirectoryScopes.ADMIN_DIRECTORY_USER
+//  val GroupScope = List(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
+//  val DriveScope = DriveScopes.DRIVE
+//  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
+
+
 
 //  val service = google.services.service(
 //    serviceAccountEmail,
@@ -43,16 +46,20 @@ object CommandLine extends App{
 //
 //  println(credential.getServiceAccountId)
 
-    val pluggableService = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, DriveScope)(_)
+
 
 //    val adminService = partial(adminImpersonatedEmail)
-    val drive = pluggableService("davenpcm@eckerd.edu").Drive
-    val files = drive.files.list()
 
-    val randomFiles = files.filter(_.name.endsWith(".jpg")).take(400)
-    val Path = "/home/davenpcm/Downloads/temp/"
-    randomFiles.foreach(println)
-    randomFiles.par.foreach(drive.files.download(Path, _))
+
+//    val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
+//    adminDirectory.users.list().foreach(println)
+
+//    val files = drive.files.list()
+//
+//    val randomFiles = files.filter(_.name.endsWith(".jpg")).take(10)
+//    val Path = "/home/davenpcm/Downloads/temp/"
+//    randomFiles.foreach(println)
+//    randomFiles.par.foreach(_.download(Path, drive))
 
 
 
