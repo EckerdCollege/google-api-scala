@@ -60,11 +60,10 @@ class files(drive: Drive) {
   }
 
   def download(outputPath: String, file: File): Unit = {
-    val id = file.getId
-    val filepath = outputPath + file.getName
+    val id = file.id.get
+    val filepath = outputPath + file.name
     val targetFile = new java.io.File(filepath)
     val outputStream = new java.io.FileOutputStream(targetFile)
-
     service.files().get(id).executeMediaAndDownloadTo(outputStream)
   }
 

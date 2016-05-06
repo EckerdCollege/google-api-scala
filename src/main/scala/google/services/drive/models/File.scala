@@ -7,6 +7,7 @@ import language.postfixOps
   */
 case class File(name: String,
                 mimeType: String,
+                id: Option[String] = None,
                 extension: Option[String] = None,
                 description: Option[String] = None,
                 parentIds: Option[List[String]] = None,
@@ -22,6 +23,7 @@ object File {
     val metadata = new com.google.api.services.drive.model.File()
       .setName(file.name)
       .setMimeType(file.mimeType)
+    if (file.id isDefined) { metadata.setId(file.id.get)}
     if (file.extension isDefined){ metadata.setFileExtension(file.extension.get)}
     if (file.description isDefined){ metadata.setDescription(file.description.get)}
     if (file.parentIds isDefined){ metadata.setParents(file.parentIds.get.asJava)}
@@ -33,6 +35,7 @@ object File {
     File(
       file.getName,
       file.getMimeType,
+      Option(file.getId),
       Option(file.getFileExtension),
       Option(file.getDescription),
       Option(file.getParents).map(_.asScala.toList)

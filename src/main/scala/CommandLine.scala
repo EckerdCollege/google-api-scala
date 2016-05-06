@@ -46,9 +46,13 @@ object CommandLine extends App{
     val pluggableService = google.services.Service(serviceAccountEmail, credentialFilePath, applicationName, ListScopes)(_)
 
 //    val adminService = partial(adminImpersonatedEmail)
-    val files = pluggableService("davenpcm@eckerd.edu").Drive.files.list()
-    files.foreach(println)
+    val drive = pluggableService("davenpcm@eckerd.edu").Drive
+    val files = drive.files.list()
 
+    val randomFiles = files.filter(_.name.endsWith(".pdf")).take(10)
+    val Path = "/home/davenpcm/Downloads/temp/"
+    randomFiles.foreach(println)
+    randomFiles.foreach(drive.files.download(Path, _))
 
 
 

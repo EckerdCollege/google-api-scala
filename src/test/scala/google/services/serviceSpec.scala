@@ -15,7 +15,7 @@ import com.typesafe.config.ConfigFactory
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.collection.JavaConverters._
-import google.services.Service
+
 
 /**
   * Created by davenpcm on 5/5/16.
