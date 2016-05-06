@@ -4,6 +4,7 @@ import scripts.GooglePhotos
 import google.services.Service
 import google.services.Scopes.DRIVE
 import google.services.Scopes.ADMIN_DIRECTORY
+import google.services.admin.directory.models.Name
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -20,13 +21,33 @@ object CommandLine extends App{
 
   val pluggableService = Service(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
 
-//  val drive = pluggableService("davenpcm@eckerd.edu").Drive
-//  val fileList = drive.files.list()
-//  fileList.par.foreach(_.download("/home/davenpcm/Downloads/temp/", drive))
+
 
   val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
-  val files = adminDirectory.users.list().foreach(println)
+//  val user = adminDirectory.users.create("TestUserName", "TestFamilyName", "usercreatetest0000001@test.eckerd.edu", "testpassword01")
+//  println(user)
+//  val changeduser = user.copy(name = Name("ChangedTestUserName", "ChangedTestFamilyName"))
+//  println(changeduser)
+//  val permanentlyChangedUser =  adminDirectory.users.update(changeduser)
+//  println(permanentlyChangedUser)
+//  adminDirectory.users.list().foreach(println)
+  val user = adminDirectory.users.get("usercreatetest0000001@test.eckerd.edu")
+  println(user)
+  val newUser = user match {
+    case Right(user) => Some(adminDirectory.users.update(user.copy(suspended = true)))
+    case _ => None
+  }
+  println(newUser)
 
+//    val drive = pluggableService("davenpcm@eckerd.edu").Drive
+//    val fileList = drive.files.list()
+//    fileList.par.foreach(_.download("/home/davenpcm/Downloads/temp/", drive))
+//  val user = adminDirectory.users.get("monkey") match {
+//    case Right(value) => value
+//    case Left(error) => error
+//  }
+//  println(user)
+//  println(user)
 //  val UserScope = DirectoryScopes.ADMIN_DIRECTORY_USER
 //  val GroupScope = List(DirectoryScopes.ADMIN_DIRECTORY_GROUP)
 //  val DriveScope = DriveScopes.DRIVE

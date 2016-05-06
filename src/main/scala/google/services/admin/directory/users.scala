@@ -1,7 +1,7 @@
 package google.services.admin.directory
 
+import google.services.admin.directory.models._
 import com.google.api.services.admin.directory.model.Users
-import google.services.admin.directory.models.User
 
 import scala.annotation.tailrec
 import collection.JavaConverters._
@@ -98,6 +98,33 @@ class users(directory: Directory) {
     val nextPageToken = result.getNextPageToken
 
     if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(nextPageToken, list)(f) else list
+  }
+
+  def create(user: User): User = {
+    service.users().insert(user).execute()
+  }
+
+  def create(name: Name, emailAddress: String, password: String): User = {
+    val email = Email(emailAddress)
+    val user = User(name, email, Some(password))
+    service.users().insert(user).execute()
+  }
+
+  def create(givenName: String, familyName: String, email: Email, password: String): User = {
+    val name = Name(givenName, familyName)
+    val user = User(name, email, Some(password))
+    service.users().insert(user).execute()
+  }
+
+  def create(givenName: String, familyName: String, emailAddress: String, password: String): User = {
+    val name = Name(givenName, familyName)
+    val email = Email(emailAddress)
+    val user = User(name, email, Some(password))
+    service.users().insert(user).execute()
+  }
+
+  def update(user: User): User = {
+    service.users().update(user.id.get, user).execute()
   }
 
 

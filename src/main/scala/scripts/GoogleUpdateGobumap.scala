@@ -299,7 +299,7 @@ object GoogleUpdateGobumap {
       * @return A GoogleIdentity
       */
     def UserToGoogleIdent(user: User): GoogleIdentity = {
-      GoogleIdentity(user.id.get, user.emails.find(_.primary == true).get.address)
+      GoogleIdentity(user.id.get, user.primaryEmail.address)
     }
 
     val googleIdentitiesSets = service.users.transformAllGoogleUsers[GoogleIdentity]()(UserToGoogleIdent)

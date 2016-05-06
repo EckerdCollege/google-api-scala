@@ -1,14 +1,17 @@
 package google.services.admin.directory.models
 
 import scala.language.implicitConversions
+import scala.language.postfixOps
+import scala.util.{Success, Failure, Try}
 /**
   * Created by davenpcm on 5/6/16.
   */
 case class User(name: Name,
-                emails: List[Email],
+                primaryEmail: Email,
+                password: Option[String] = None,
                 id: Option[String] = None,
                 orgUnitPath: String = "/",
-                agreedToTerms: Boolean = false,
+                agreedToTerms: Option[Boolean] = Some(false),
                 changePasswordAtNextLogin: Boolean = false,
                 includeInGlobalAddressList: Boolean = true,
                 ipWhiteListed: Boolean = false,
@@ -22,13 +25,8 @@ case class User(name: Name,
 object User {
 
   implicit def toGoogleApi(user: User): com.google.api.services.admin.directory.model.User = {
-    import scala.collection.JavaConverters._
-
-    val primaryEmail = user.emails.find(_.primary == true).get.address
-
     val newUser = new com.google.api.services.admin.directory.model.User
     newUser
-      .setAgreedToTerms(user.agreedToTerms)
       .setChangePasswordAtNextLogin(user.changePasswordAtNextLogin)
       .setIncludeInGlobalAddressList(user.includeInGlobalAddressList)
       .setIpWhitelisted(user.ipWhiteListed)
@@ -36,17 +34,27 @@ object User {
       .setIsMailboxSetup(user.isMailboxSetup)
       .setSuspended(user.suspended)
       .setOrgUnitPath(user.orgUnitPath)
-      .setEmails(user.emails.asJava)
-      .setPrimaryEmail(primaryEmail)
+      .setPrimaryEmail(user.primaryEmail)
+      .setName(user.name)
+
+    if (user.agreedToTerms isDefined) { newUser.setAgreedToTerms( user.agreedToTerms.get)}
+    if (user.password isDefined) { newUser.setPassword( user.password.get)}
+
+
+    newUser
   }
 
   implicit def fromGoogleApi(user: com.google.api.services.admin.directory.model.User): User = {
     User(
       user.getName,
-      List(Email(user.getPrimaryEmail, true)),
+      Email(user.getPrimaryEmail),
+      Option(user.getPassword),
       Option(user.getId),
       user.getOrgUnitPath,
-      user.getAgreedToTerms,
+      Option(user.getAgreedToTerms) match {
+        case Some(value ) => Some(value)
+        case None => None
+      },
       user.getChangePasswordAtNextLogin,
       user.getIncludeInGlobalAddressList,
       user.getIpWhitelisted,
