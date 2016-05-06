@@ -1,7 +1,7 @@
 package google.services.admin.directory
 
-
-import com.google.api.services.admin.directory.model.{Group, Groups}
+import google.services.admin.directory.models.Group
+import com.google.api.services.admin.directory.model.Groups
 import collection.JavaConverters._
 import scala.annotation.tailrec
 
@@ -36,7 +36,7 @@ case class groups(directory: Directory) {
 
     val typedList = List[Groups](result)
       .map(groups => groups.getGroups.asScala.toList)
-      .foldLeft(List[Group]())((acc, listGroups) => listGroups ::: acc)
+      .foldLeft(List[Group]())((acc, listGroups) => listGroups.map(Group.apply) ::: acc)
 
     val myList = typedList ::: groups
 
