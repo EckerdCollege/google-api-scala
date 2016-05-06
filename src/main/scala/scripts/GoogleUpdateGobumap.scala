@@ -3,7 +3,7 @@ package scripts
 import java.sql.Timestamp
 
 import google.services.admin.directory.Directory
-import com.google.api.services.admin.directory.model.User
+import google.services.admin.directory.models.User
 import persistence.entities.representations.{GOBUMAP_R, GOREMAL_R, GoogleIdentity}
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
@@ -299,7 +299,7 @@ object GoogleUpdateGobumap {
       * @return A GoogleIdentity
       */
     def UserToGoogleIdent(user: User): GoogleIdentity = {
-      GoogleIdentity(user.getId, user.getPrimaryEmail)
+      GoogleIdentity(user.id.get, user.emails.find(_.primary == true).get.address)
     }
 
     val googleIdentitiesSets = service.users.transformAllGoogleUsers[GoogleIdentity]()(UserToGoogleIdent)

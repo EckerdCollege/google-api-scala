@@ -1,6 +1,7 @@
 package google.services.admin.directory
 
-import com.google.api.services.admin.directory.model.{User, Users}
+import com.google.api.services.admin.directory.model.Users
+import google.services.admin.directory.models.User
 
 import scala.annotation.tailrec
 import collection.JavaConverters._
@@ -36,9 +37,9 @@ class users(directory: Directory) {
       .execute()
 
     val typedList = List[Users](result)
-      .map(users => Option(users.getUsers))
-      .map{ case Some(javaList) => javaList.asScala.toList case None => List[User]()}
-      .foldLeft(List[User]())((acc, listUsers) => listUsers ::: acc)
+      .map(users => users.getUsers)
+      .map{javalist =>  javalist.asScala.toList}
+      .foldLeft(List[User]())((acc, listUsers) => listUsers.map(User.fromGoogleApi) ::: acc)
 
     val myList = typedList ::: users
 
@@ -87,9 +88,9 @@ class users(directory: Directory) {
       .execute()
 
     lazy val typedList = List[Users](result)
-      .map(users => Option(users.getUsers))
-      .map{ case Some(javaList) => javaList.asScala.toList case None => List[User]()}
-      .foldLeft(List[User]())((acc, listUsers) => listUsers ::: acc)
+      .map(users => users.getUsers)
+      .map{javaList => javaList.asScala.toList}
+      .foldLeft(List[User]())((acc, listUsers) => listUsers.map(User.fromGoogleApi) ::: acc)
       .map(user => f(user))
 
     lazy val list: List[T] = typedList ::: transformed
