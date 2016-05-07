@@ -1,6 +1,7 @@
 package google.services.admin.directory
 
 import google.services.admin.directory.models.Member
+import google.services.admin.directory.models.Group
 import com.google.api.services.admin.directory.model.Members
 import scala.collection.JavaConverters._
 import scala.annotation.tailrec
@@ -64,13 +65,32 @@ class members(directory: Directory) {
 
   }
 
-  def add(groupKey: String, newMemberId: String, role: String): Member = {
+  def addById(groupKey: String, newMemberId: String): Member = {
 
-    val newMember = new Member
-    newMember.setId(newMemberId)
-    newMember.setRole(role)
+    val newMember = Member(None, Some(newMemberId))
 
     val InsertedMember = service.members().insert(groupKey, newMember).execute()
+    InsertedMember
+  }
+
+  def add(groupKey: String, newMemberEmail: String): Member = {
+    val newMember = Member(Some(newMemberEmail))
+    val InsertedMember = service.members().insert(groupKey, newMember).execute()
+    InsertedMember
+  }
+
+  def add(groupKey: String, newMember: Member): Member = {
+    val InsertedMember = service.members().insert(groupKey, newMember).execute()
+    InsertedMember
+  }
+
+  def add(group: Group, newMember: Member): Member = {
+    val InsertedMember = if ( group.id.isDefined){
+      service.members().insert(group.id.get, newMember).execute()
+    } else {
+      service.members().insert(group.email, newMember).execute()
+    }
+
     InsertedMember
   }
 
