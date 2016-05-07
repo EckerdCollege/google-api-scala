@@ -13,6 +13,7 @@ case class Drive(service: Service) {
     .build()
 
   val files = new files(this)
+  val permissions = new permissions(this)
 
 }
 object Drive {

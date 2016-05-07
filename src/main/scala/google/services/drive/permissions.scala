@@ -12,20 +12,21 @@ class permissions(drive: Drive) {
 
   private implicit def toGoogleApi(permission: Permission): com.google.api.services.drive.model.Permission = {
     val Permission = new com.google.api.services.drive.model.Permission()
-      .setEmailAddress(permission.emailAddress)
       .setRole(permission.role)
       .setType(permission.permissionType)
-      .setDisplayName(permission.displayName)
+
+    if (permission.emailAddress isDefined){ Permission.setEmailAddress(permission.emailAddress.get) }
+    if (permission.displayName isDefined){ Permission.setDisplayName(permission.displayName.get) }
     if (permission.id isDefined) { Permission.setId(permission.id.get)}
     Permission
   }
 
   private implicit def fromGoogleApi(permission: com.google.api.services.drive.model.Permission): Permission = {
     Permission(
-      permission.getEmailAddress,
       permission.getRole,
       permission.getType,
-      permission.getDisplayName,
+      Option(permission.getEmailAddress),
+      Option(permission.getDisplayName),
       Option(permission.getId)
     )
   }
@@ -45,10 +46,10 @@ class permissions(drive: Drive) {
   }
 
   def get(fileId: String, permissionId: String): Permission = {
-    service.permissions().get(fileId, permissionId).execute()
+    service.permissions().get(fileId, permissionId).setFields("id, type, emailAddress, role, displayName").execute()
   }
 
-  def delete(fileId: String, permissionId: String): Unit = {
+  def deleteById(fileId: String, permissionId: String): Unit = {
     service.permissions().delete(fileId, permissionId).execute()
   }
 
@@ -69,7 +70,7 @@ class permissions(drive: Drive) {
     }
   }
 
-  def create(
+  def createById(
              fileId: String,
              permission: Permission,
              sendNotificationEmail: Boolean,

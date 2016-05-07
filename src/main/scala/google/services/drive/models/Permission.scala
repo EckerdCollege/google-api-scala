@@ -4,9 +4,10 @@ package google.services.drive.models
 /**
   * Created by davenpcm on 5/4/16.
   */
-case class Permission(emailAddress: String,
+case class Permission(
                       role: String,
                       permissionType: String,
-                      displayName: String ,
+                      emailAddress: Option[String] = None,
+                      displayName: Option[String] = None,
                       id: Option[String] = None
                      )

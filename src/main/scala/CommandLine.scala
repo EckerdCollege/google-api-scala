@@ -4,8 +4,9 @@ import scripts.GooglePhotos
 import google.services.Service
 import google.services.Scopes.DRIVE
 import google.services.Scopes.ADMIN_DIRECTORY
-import google.services.admin.directory.models.Name
-import google.services.admin.directory.models.User
+import google.services.admin.directory.models.{Email, Name, User}
+import google.services.drive.models.File
+
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -13,7 +14,7 @@ import google.services.admin.directory.models.User
 object CommandLine extends App{
 
 
-  val scope = ADMIN_DIRECTORY
+  val scope = DRIVE
   val config = ConfigFactory.load().getConfig("google")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
@@ -21,32 +22,64 @@ object CommandLine extends App{
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
   val pluggableService = Service(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
+  val myDrive = pluggableService("davenpcm@eckerd.edu").Drive
 
+  val Files = myDrive.files.list().take(100)
+  val Permissions = Files.map(file => myDrive.permissions.list(file.id.get))
+  Files.foreach(println)
+  Permissions.foreach(println)
 
-
-  val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
-  val users = adminDirectory.users.list().map(user => user.primaryEmail.address -> user)(collection.breakOut): Map[String, User]
-  val groups = adminDirectory.groups.list().par.map(g =>
-    (g.name, adminDirectory.members.list(g.id.get))
-  )//.map(value => value._2 match {
-//    case Right(valu) => value
-//    case Left(e) => (value._1, adminDirectory.members.list(value._1.id.get))
-//  }).map(value => value._2 match {
-//    case Right(valu) => value
-//    case Left(e) => (value._1.name, adminDirectory.members.list(value._1.id.get))
-//  }
+//  val Folders = Files.filter(_.mimeType == "application/vnd.google-apps.folder")
+//  val parent = Files.getOrElse(File("Lied To", "Majorly Fake"))
+////  val folder = myDrive.files.get("Asset Management")
+//  val finalfile = myDrive.files.getParents(parent).right.getOrElse("Lied to Again")
+//  println(finalfile)
+//  val FoldersWithParentsFoundWithErrors: List[Either[Throwable, File]] = Folders.take(1000).map(file =>
+//    myDrive.files.getParents(file)
 //  )
-  val right = groups
-      .filter(group => group._2.isRight && group._2.right.get.nonEmpty)
-      .map(g =>
-        (g._1, g._2.right.get
-          .map(member =>
-            users.getOrElse(member.email.getOrElse("getOrElseMembers Response"), "getOrElseUsersResponse")
-          )
-        )
-      )
-  right.foreach(println)
-  println(right.length)
+//
+//  val FolderWithParentsFound = FoldersWithParentsFoundWithErrors.filter(_.isRight).map(_.right.get)
+//
+//  val FoldersWithMoreThan1Parent = FolderWithParentsFound.filter(_.parentIds.get.length > 1)
+//  val FoldersWith1Parent = FolderWithParentsFound.filter(_.parentIds.get.length == 1)
+//  val FoldersWithNoParent = FolderWithParentsFound.filter(_.parentIds.get.length == 0)
+
+
+//  FoldersWithMoreThan1Parent.foreach(println)
+//  FoldersWith1Parent.foreach(println)
+//  FoldersWithNoParent.foreach(println)
+//  println(Folders.length)
+//  println(FoldersWithMoreThan1Parent.length)
+//  println(FoldersWith1Parent.length)
+//  println(FoldersWithNoParent.length)
+
+
+
+
+
+
+
+
+
+//  val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
+//  val users = adminDirectory.users.list().map(user => user.primaryEmail.address -> user)(collection.breakOut): Map[String, User]
+//  println(users.get("davenpcm@eckerd.edu"))
+//  val groups = adminDirectory.groups.list().par.map(g =>
+//    (g.name, adminDirectory.members.list(g.id.get))
+//  )
+//  val right = groups
+//      .filter(group => group._2.isRight && group._2.right.get.nonEmpty)
+//      .map(g =>
+//        (
+//          g._1,
+//          g._2.right.get
+//            .map(member =>
+//              users.getOrElse(member.email.getOrElse("getOrElseMembers Response"), User(Name("Test", "Test"), Email("Test"))).name
+//            )
+//        )
+//      )
+//  right.foreach(println)
+//  println(right.length)
 //  val user = adminDirectory.users.create("TestUserName", "TestFamilyName", "usercreatetest0000001@test.eckerd.edu", "testpassword01")
 //  println(user)
 //  val changeduser = user.copy(name = Name("ChangedTestUserName", "ChangedTestFamilyName"))
