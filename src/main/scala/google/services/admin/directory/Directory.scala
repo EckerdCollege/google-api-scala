@@ -6,7 +6,7 @@ import scala.language.implicitConversions
   */
 case class Directory(service: Service) {
 
-  val directory = new com.google.api.services.admin.directory.Directory.Builder(
+  private val directory = new com.google.api.services.admin.directory.Directory.Builder(
     service.httpTransport,
     service.jsonFactory,
     service.credential)

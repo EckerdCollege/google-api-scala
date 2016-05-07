@@ -5,12 +5,35 @@ import google.services.admin.directory.models.Group
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
+import language.implicitConversions
+import language.postfixOps
 
 /**
   * Created by davenpcm on 5/3/16.
   */
 class members(directory: Directory) {
-  val service = directory.directory
+
+  private val service: com.google.api.services.admin.directory.Directory = directory
+
+  private implicit def toGoogleApi(member: Member): com.google.api.services.admin.directory.model.Member = {
+    val newMember = new com.google.api.services.admin.directory.model.Member()
+      .setRole(member.role)
+      .setType(member.memberType)
+
+    if (member.email isDefined){ newMember.setEmail(member.email.get)}
+    if (member.id isDefined){ newMember.setId(member.id.get)}
+
+    newMember
+  }
+
+  private implicit def fromGoogleApi(member: com.google.api.services.admin.directory.model.Member): Member = {
+    Member(
+      Option(member.getEmail),
+      Option(member.getId),
+      member.getRole,
+      member.getType
+    )
+  }
 
   /**
     * The function takes a groupKey to return all members of the group. Current Error Handling will terminate on an error
@@ -19,50 +42,42 @@ class members(directory: Directory) {
     *
     * @param groupKey This is either the unique group id or the group email address. Which specifies which group to
     *                 return the members of
-    * @param pageToken This is the page token that shows where we are in the pages.
-    * @param members This is the growing list of group members
     * @return A list of all members of the group
     */
-  @tailrec
-  final def list(groupKey: String,
-           pageToken: String = "",
-           members: List[Member] = List[Member]()
-          ): Either[Throwable, List[Member]] = {
-    import scala.collection.JavaConverters._
-    import com.google.api.services.admin.directory.model.Members
-    
-    val resultTry = Try(
-      service.members()
+  def list(groupKey: String): List[Member] = {
+    @tailrec
+    def list(
+             pageToken: String = "",
+             members: List[Member] = List[Member]()
+            ): List[Member] = {
+      import scala.collection.JavaConverters._
+      import com.google.api.services.admin.directory.model.Members
+
+      val result = service.members()
         .list(groupKey)
         .setMaxResults(500)
         .setPageToken(pageToken)
         .execute()
-    )
-    
 
-    resultTry match {
-      case Success(result) =>
-        val typedList = List[Members](result)
-          .map(members =>
-            if (Option(members.getMembers).isDefined ){
-              members.getMembers.asScala.toList}
-            else {
-              List[com.google.api.services.admin.directory.model.Member]()
-            }
-          )
-          .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(Member.apply) ::: acc)
+      val typedList = List[Members](result)
+        .map(members =>
+          if (Option(members.getMembers).isDefined) {
+            members.getMembers.asScala.toList
+          }
+          else {
+            List[com.google.api.services.admin.directory.model.Member]()
+          }
+        )
+        .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(fromGoogleApi) ::: acc)
 
-        val myList = typedList ::: members
+      val myList = typedList ::: members
 
-        val nextPageToken = result.getNextPageToken
+      val nextPageToken = result.getNextPageToken
 
-        if (nextPageToken != null && result.getMembers != null) list(groupKey, nextPageToken, myList) else Right(myList)
-      case Failure(ex) => ex match {
-        case e: com.google.api.client.googleapis.json.GoogleJsonResponseException => list(groupKey, pageToken, members)
-        case _ => Left(ex)
-      }
+      if (nextPageToken != null && result.getMembers != null) list(nextPageToken, myList)
+      else myList
     }
-
+    list()
   }
 
   def addById(groupKey: String, newMemberId: String): Member = {

@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
   * Created by davenpcm on 5/3/16.
   */
 class photos(directory: Directory) {
-  val service = directory.directory
+  private val service: com.google.api.services.admin.directory.Directory = directory
 
   def get(userKey: String): Either[Throwable, UserPhoto] = {
 
