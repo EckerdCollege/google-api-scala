@@ -42,7 +42,13 @@ class members(directory: Directory) {
     resultTry match {
       case Success(result) =>
         val typedList = List[Members](result)
-          .map(members => members.getMembers.asScala.toList)
+          .map(members =>
+            if (Option(members.getMembers).isDefined ){
+              members.getMembers.asScala.toList}
+            else {
+              List[com.google.api.services.admin.directory.model.Member]()
+            }
+          )
           .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(Member.apply) ::: acc)
 
         val myList = typedList ::: members
@@ -50,8 +56,10 @@ class members(directory: Directory) {
         val nextPageToken = result.getNextPageToken
 
         if (nextPageToken != null && result.getMembers != null) list(groupKey, nextPageToken, myList) else Right(myList)
-
-      case Failure(ex) => Left(ex)
+      case Failure(ex) => ex match {
+        case e: com.google.api.client.googleapis.json.GoogleJsonResponseException => list(groupKey, pageToken, members)
+        case _ => Left(ex)
+      }
     }
 
   }

@@ -5,6 +5,7 @@ import google.services.Service
 import google.services.Scopes.DRIVE
 import google.services.Scopes.ADMIN_DIRECTORY
 import google.services.admin.directory.models.Name
+import google.services.admin.directory.models.User
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -24,9 +25,28 @@ object CommandLine extends App{
 
 
   val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
-  val groups = adminDirectory.groups.list().par.foreach(g =>
-    println(adminDirectory.members.list(g.id.get))
-  )
+  val users = adminDirectory.users.list().map(user => user.primaryEmail.address -> user)(collection.breakOut): Map[String, User]
+  val groups = adminDirectory.groups.list().par.map(g =>
+    (g.name, adminDirectory.members.list(g.id.get))
+  )//.map(value => value._2 match {
+//    case Right(valu) => value
+//    case Left(e) => (value._1, adminDirectory.members.list(value._1.id.get))
+//  }).map(value => value._2 match {
+//    case Right(valu) => value
+//    case Left(e) => (value._1.name, adminDirectory.members.list(value._1.id.get))
+//  }
+//  )
+  val right = groups
+      .filter(group => group._2.isRight && group._2.right.get.nonEmpty)
+      .map(g =>
+        (g._1, g._2.right.get
+          .map(member =>
+            users.getOrElse(member.email.getOrElse("getOrElseMembers Response"), "getOrElseUsersResponse")
+          )
+        )
+      )
+  right.foreach(println)
+  println(right.length)
 //  val user = adminDirectory.users.create("TestUserName", "TestFamilyName", "usercreatetest0000001@test.eckerd.edu", "testpassword01")
 //  println(user)
 //  val changeduser = user.copy(name = Name("ChangedTestUserName", "ChangedTestFamilyName"))
