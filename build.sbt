@@ -16,7 +16,7 @@ libraryDependencies ++= List(
   "com.google.api-client" % "google-api-client-extensions" % "1.6.0-beta",
   "com.google.apis" % "google-api-services-calendar" % "v3-rev178-1.21.0",
   "com.google.apis" % "google-api-services-gmail" % "v1-rev40-1.21.0",
-  "com.google.apis" % "google-api-services-drive" % "v3-rev20-1.21.0"
+  "com.google.apis" % "google-api-services-drive" % "v3-rev23-1.22.0"
 )
 
 
