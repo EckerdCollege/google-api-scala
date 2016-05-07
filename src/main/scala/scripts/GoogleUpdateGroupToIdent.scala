@@ -39,11 +39,11 @@ object GoogleUpdateGroupToIdent {
     )
 
     val group2Members = groupidents.par.map(ident =>
-      service.members.list(ident.email).fold(e => {println(e); List[Member]()}, list=> list)
+      service.members.list(ident.email)
         .map(member =>
-          (Group2Ident_R(ident.id, member.getId, "", member.getRole, member.getType),
+          (Group2Ident_R(ident.id, member.id.get, "", member.role, member.memberType),
             Await.result(db.run(group2IdentTableQuery.withFilter(rec =>
-              rec.groupId === ident.id && rec.identID === member.getId).result.headOption), Duration(1, "second"))))
+              rec.groupId === ident.id && rec.identID === member.id.get).result.headOption), Duration(1, "second"))))
     )
 
     val Tuples = group2Members

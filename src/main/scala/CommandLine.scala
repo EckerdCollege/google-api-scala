@@ -14,7 +14,7 @@ import google.services.drive.models.File
 object CommandLine extends App{
 
 
-  val scope = DRIVE
+  val scope = ADMIN_DIRECTORY
   val config = ConfigFactory.load().getConfig("google")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
@@ -22,12 +22,21 @@ object CommandLine extends App{
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
   val pluggableService = Service(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
-  val myDrive = pluggableService("davenpcm@eckerd.edu").Drive
+//  val myDrive = pluggableService("davenpcm@eckerd.edu").Drive
+//
+//  val Files = myDrive.files.list().take(100)
+//  val Permissions = Files.map(file => myDrive.permissions.list(file.id.get))
+//  Files.foreach(println)
+//  Permissions.foreach(println)
+  val dir = pluggableService(adminImpersonatedEmail).Directory
+  val users = dir.users.list()
+  val groups = dir.groups.list()
 
-  val Files = myDrive.files.list().take(100)
-  val Permissions = Files.map(file => myDrive.permissions.list(file.id.get))
-  Files.foreach(println)
-  Permissions.foreach(println)
+  users.foreach(println)
+  groups.foreach(println)
+  println(users.length)
+  println(groups.length)
+
 
 //  val Folders = Files.filter(_.mimeType == "application/vnd.google-apps.folder")
 //  val parent = Files.getOrElse(File("Lied To", "Majorly Fake"))
