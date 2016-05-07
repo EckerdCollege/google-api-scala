@@ -35,7 +35,7 @@ object GoogleUpdateGroupToIdent {
     val currentGroups = service.groups.list()
 
     val groupidents = currentGroups.map(group =>
-      GroupIdent(group.getId, group.getName, group.getEmail, group.getDirectMembersCount, group.getDescription)
+      GroupIdent(group.id.get, group.name, group.email, group.directMemberCount.get, group.description.get)
     )
 
     val group2Members = groupidents.par.map(ident =>

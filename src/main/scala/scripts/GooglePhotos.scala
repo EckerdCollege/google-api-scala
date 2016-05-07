@@ -104,11 +104,11 @@ object GooglePhotos {
     * @return A Sequence for all google users of the user id and the option of an image created.
     */
   def getAllGoogleImages( outputFolder: String, service: Directory): Seq[(User, Option[Image])] = {
-
+    import google.services.JavaConverters._
     val users = service.users.list()
 
     val photos = users
-        .par.map(user => getGoogleImage(outputFolder, user, service))
+        .par.map(user => getGoogleImage(outputFolder, user.asJava, service))
 
     photos.foreach(tuple => create(tuple._2))
 

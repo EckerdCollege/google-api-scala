@@ -31,22 +31,22 @@ object GoogleUpdateGroupMaster {
     val currentGroupsinGoogle = service.groups.list()
 
     val existsTupleFuture = Future.sequence(currentGroupsinGoogle.par.map(group =>
-      db.run(GROUP_MASTER_TABLEQUERY.withFilter(a => a.id === group.getId).result)
+      db.run(GROUP_MASTER_TABLEQUERY.withFilter(a => a.id === group.id.get).result)
         .map(matchingRecs => (group, matchingRecs.headOption))).seq)
 
     val FutureMadness = existsTupleFuture.map(
       tuples => tuples.map(
         tuple =>
           GroupMaster_R(
-            tuple._1.getId,
+            tuple._1.id.get,
             tuple._2 match {
               case None => "N"
               case Some(rec) => rec.autoIndicator
             },
-            tuple._1.getName,
-            tuple._1.getEmail,
-            tuple._1.getDirectMembersCount,
-            Option(tuple._1.getDescription.take(254)),
+            tuple._1.name,
+            tuple._1.email,
+            tuple._1.directMemberCount.get,
+            Option(tuple._1.description.get.take(254)),
             tuple._2.flatMap(rec => rec.processIndicator)
           )
       )
