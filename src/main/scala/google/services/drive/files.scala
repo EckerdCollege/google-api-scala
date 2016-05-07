@@ -1,15 +1,18 @@
 package google.services.drive
 
 import models._
-import scala.collection.JavaConverters._
+
+import scala.util.{Try, Success, Failure}
+
 
 /**
   * Created by davenpcm on 5/4/16.
   */
 class files(drive: Drive) {
-  val service = drive.drive
+  private val service = drive.drive
 
   def list(pageToken: String = "", files: List[File] = List[File]()): List[File] = {
+    import scala.collection.JavaConverters._
     import com.google.api.services.drive.model.FileList
     val result = service.files().list()
       .setPageSize(500)
@@ -28,6 +31,7 @@ class files(drive: Drive) {
   }
 
   def listApplicationData(space: String = "appDataFolder", pageToken: String = "", files: List[File] = List[File]()): List[File] = {
+    import scala.collection.JavaConverters._
     import com.google.api.services.drive.model.FileList
     val result = service.files().list()
       .setPageSize(500)
@@ -50,13 +54,28 @@ class files(drive: Drive) {
     service.files().delete(fileId).execute()
   }
 
-  def upload(file: File): File = file.content match {
+  def create(file: File): File = file.content match {
     case None => service.files().create(file).execute()
     case Some(fileContent) => service.files().create(file, fileContent).execute()
   }
 
   def get(fileId: String): File =  {
     service.files().get(fileId).execute()
+  }
+
+  def update(file: File): File = {
+    service.files().update(file.id.get, file).execute()
+  }
+
+  def getParents(file: File): Either[Throwable, File] = {
+    val returnedFile: Try[File] = Try(service.files().get(file.id.get).setFields("parents").execute())
+    returnedFile match {
+      case Failure(e) => Left(e)
+      case Success(gotFile) =>
+        val parents = gotFile.parentIds
+        Right(file.copy(parentIds = parents))
+    }
+
   }
 
   def download(outputPath: String, file: File): Unit = {
