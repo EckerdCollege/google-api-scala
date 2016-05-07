@@ -7,79 +7,16 @@ import scala.annotation.tailrec
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
+import google.services.JavaConverters._
 
 /**
   * Created by davenpcm on 5/3/16.
   */
 class users(directory: Directory) {
 
-  private val service: com.google.api.services.admin.directory.Directory = directory
-
-  private implicit def userToGoogleApi(user: User): com.google.api.services.admin.directory.model.User = {
-    val newUser = new com.google.api.services.admin.directory.model.User
-    newUser
-      .setChangePasswordAtNextLogin(user.changePasswordAtNextLogin)
-      .setIncludeInGlobalAddressList(user.includeInGlobalAddressList)
-      .setIpWhitelisted(user.ipWhiteListed)
-      .setIsAdmin(user.isAdmin)
-      .setIsMailboxSetup(user.isMailboxSetup)
-      .setSuspended(user.suspended)
-      .setOrgUnitPath(user.orgUnitPath)
-      .setPrimaryEmail(user.primaryEmail)
-      .setName(user.name)
-
-    if (user.agreedToTerms isDefined) { newUser.setAgreedToTerms( user.agreedToTerms.get)}
-    if (user.password isDefined) { newUser.setPassword( user.password.get)}
+  private val service = directory.asJava
 
 
-    newUser
-  }
-
-  private implicit def userFromGoogleApi(user: com.google.api.services.admin.directory.model.User): User = {
-    User(
-      user.getName,
-      Email(user.getPrimaryEmail),
-      Option(user.getPassword),
-      Option(user.getId),
-      user.getOrgUnitPath,
-      Option(user.getAgreedToTerms) match {
-        case Some(value ) => Some(value)
-        case None => None
-      },
-      user.getChangePasswordAtNextLogin,
-      user.getIncludeInGlobalAddressList,
-      user.getIpWhitelisted,
-      user.getIsAdmin,
-      user.getIsMailboxSetup,
-      user.getSuspended
-    )
-  }
-
-  private implicit def nameToGoogleApi(name: Name): com.google.api.services.admin.directory.model.UserName = {
-    new com.google.api.services.admin.directory.model.UserName()
-      .setGivenName(name.givenName)
-      .setFamilyName(name.familyName)
-  }
-
-  private implicit def nameFromGoogleApi(userName: com.google.api.services.admin.directory.model.UserName): Name = {
-    Name(
-      userName.getGivenName,
-      userName.getFamilyName
-    )
-  }
-
-  private implicit def emailToGoogleApi(email: Email): com.google.api.services.admin.directory.model.UserEmail = {
-    new com.google.api.services.admin.directory.model.UserEmail()
-      .setAddress(email.address)
-      .setPrimary(email.primary)
-  }
-
-  private implicit def emailFromGoogleApi(userEmail: com.google.api.services.admin.directory.model.UserEmail): Email = {
-    Email(
-      userEmail.getAddress,
-      userEmail.getPrimary
-    )
-  }
 
   /**
     * This is a simple user accumulation function that collects all users in eckerd. It does no additional modification
@@ -105,7 +42,7 @@ class users(directory: Directory) {
       val typedList = List[Users](result)
         .map(users => users.getUsers)
         .map { javaList => javaList.asScala.toList }
-        .foldLeft(List[User]())((acc, listUsers) => listUsers.map(userFromGoogleApi) ::: acc)
+        .foldLeft(List[User]())((acc, listUsers) => listUsers.map(_.asScala) ::: acc)
 
       val myList = typedList ::: users
 
@@ -123,7 +60,7 @@ class users(directory: Directory) {
     * @return
     */
   def get(identifier: String): Either[Throwable, User] = {
-    val attempt = Try(service.users().get(identifier).execute())
+    val attempt = Try(service.users().get(identifier).execute().asScala)
     attempt match {
       case Success(member)=> Right(member)
       case Failure(e) => Left(e)
@@ -161,7 +98,7 @@ class users(directory: Directory) {
       lazy val typedList = List[Users](result)
         .map(users => users.getUsers)
         .map { javaList => javaList.asScala.toList }
-        .foldLeft(List[User]())((acc, listUsers) => listUsers.map(userFromGoogleApi) ::: acc)
+        .foldLeft(List[User]())((acc, listUsers) => listUsers.map(_.asScala) ::: acc)
         .map(user => f(user))
 
       lazy val list: List[T] = typedList ::: transformed
@@ -174,30 +111,30 @@ class users(directory: Directory) {
   }
 
   def create(user: User): User = {
-    service.users().insert(user).execute()
+    service.users().insert(user.asJava).execute().asScala
   }
 
   def create(name: Name, emailAddress: String, password: String): User = {
     val email = Email(emailAddress)
     val user = User(name, email, Some(password))
-    service.users().insert(user).execute()
+    service.users().insert(user.asJava).execute().asScala
   }
 
   def create(givenName: String, familyName: String, email: Email, password: String): User = {
     val name = Name(givenName, familyName)
     val user = User(name, email, Some(password))
-    service.users().insert(user).execute()
+    service.users().insert(user.asJava).execute().asScala
   }
 
   def create(givenName: String, familyName: String, emailAddress: String, password: String): User = {
     val name = Name(givenName, familyName)
     val email = Email(emailAddress)
     val user = User(name, email, Some(password))
-    service.users().insert(user).execute()
+    service.users().insert(user.asJava).execute().asScala
   }
 
   def update(user: User): User = {
-    service.users().update(user.id.get, user).execute()
+    service.users().update(user.id.get, user.asJava).execute().asScala
   }
 
 

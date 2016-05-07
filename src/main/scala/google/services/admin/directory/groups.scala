@@ -1,8 +1,7 @@
 package google.services.admin.directory
 
 import google.services.admin.directory.models.Group
-import scala.language.implicitConversions
-import scala.language.postfixOps
+import google.services.JavaConverters._
 import scala.annotation.tailrec
 
 /**
@@ -10,31 +9,9 @@ import scala.annotation.tailrec
   */
 case class groups(directory: Directory) {
 
-  private val service: com.google.api.services.admin.directory.Directory = directory
+  private val service = directory.asJava
 
-  private implicit def toGoogleApi(group: Group): com.google.api.services.admin.directory.model.Group = {
-    val newGroup = new com.google.api.services.admin.directory.model.Group()
-      .setName(group.name)
-      .setEmail(group.email)
 
-    if (group.id isDefined) { newGroup.setId(group.id.get) }
-    if (group.description isDefined) { newGroup.setDescription(group.description.get) }
-    if (group.directMemberCount isDefined){ newGroup.setDirectMembersCount(group.directMemberCount.get)}
-    if (group.adminCreated isDefined){ newGroup.setAdminCreated(group.adminCreated.get)}
-
-    newGroup
-  }
-
-  private implicit def fromGoogleApi(group: com.google.api.services.admin.directory.model.Group): Group = {
-    Group(
-      group.getName,
-      group.getEmail,
-      Option(group.getId),
-      Option(group.getDescription),
-      Option(group.getDirectMembersCount),
-      Option(group.getAdminCreated)
-    )
-  }
 
   def list(domain: String = "eckerd.edu", resultsPerPage: Int = 500): List[Group] = {
     @tailrec
@@ -55,7 +32,7 @@ case class groups(directory: Directory) {
 
       val typedList = List[Groups](result)
         .map(groups => groups.getGroups.asScala.toList)
-        .foldLeft(List[Group]())((acc, listGroups) => listGroups.map(fromGoogleApi) ::: acc)
+        .foldLeft(List[Group]())((acc, listGroups) => listGroups.map(_.asScala) ::: acc)
 
       val myList = typedList ::: groups
 
@@ -74,7 +51,7 @@ case class groups(directory: Directory) {
     * @return The group created with all the information google has filled in on top what was originally entered.
     */
   def create(group: Group): Group = {
-    service.groups().insert(group).execute()
+    service.groups().insert(group.asJava).execute().asScala
   }
 
   /**

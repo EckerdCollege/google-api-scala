@@ -5,6 +5,7 @@ import google.services.admin.directory.models.Group
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
+import google.services.JavaConverters._
 import language.implicitConversions
 import language.postfixOps
 
@@ -13,27 +14,7 @@ import language.postfixOps
   */
 class members(directory: Directory) {
 
-  private val service: com.google.api.services.admin.directory.Directory = directory
-
-  private implicit def toGoogleApi(member: Member): com.google.api.services.admin.directory.model.Member = {
-    val newMember = new com.google.api.services.admin.directory.model.Member()
-      .setRole(member.role)
-      .setType(member.memberType)
-
-    if (member.email isDefined){ newMember.setEmail(member.email.get)}
-    if (member.id isDefined){ newMember.setId(member.id.get)}
-
-    newMember
-  }
-
-  private implicit def fromGoogleApi(member: com.google.api.services.admin.directory.model.Member): Member = {
-    Member(
-      Option(member.getEmail),
-      Option(member.getId),
-      member.getRole,
-      member.getType
-    )
-  }
+  private val service = directory.asJava
 
   /**
     * The function takes a groupKey to return all members of the group. Current Error Handling will terminate on an error
@@ -68,7 +49,7 @@ class members(directory: Directory) {
             List[com.google.api.services.admin.directory.model.Member]()
           }
         )
-        .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(fromGoogleApi) ::: acc)
+        .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(_.asScala) ::: acc)
 
       val myList = typedList ::: members
 
@@ -84,29 +65,29 @@ class members(directory: Directory) {
 
     val newMember = Member(None, Some(newMemberId))
 
-    val InsertedMember = service.members().insert(groupKey, newMember).execute()
-    InsertedMember
+    val InsertedMember = service.members().insert(groupKey, newMember.asJava).execute()
+    InsertedMember.asScala
   }
 
   def add(groupKey: String, newMemberEmail: String): Member = {
     val newMember = Member(Some(newMemberEmail))
-    val InsertedMember = service.members().insert(groupKey, newMember).execute()
-    InsertedMember
+    val InsertedMember = service.members().insert(groupKey, newMember.asJava).execute()
+    InsertedMember.asScala
   }
 
   def add(groupKey: String, newMember: Member): Member = {
-    val InsertedMember = service.members().insert(groupKey, newMember).execute()
-    InsertedMember
+    val InsertedMember = service.members().insert(groupKey, newMember.asJava).execute()
+    InsertedMember.asScala
   }
 
   def add(group: Group, newMember: Member): Member = {
     val InsertedMember = if ( group.id.isDefined){
-      service.members().insert(group.id.get, newMember).execute()
+      service.members().insert(group.id.get, newMember.asJava).execute()
     } else {
-      service.members().insert(group.email, newMember).execute()
+      service.members().insert(group.email, newMember.asJava).execute()
     }
 
-    InsertedMember
+    InsertedMember.asScala
   }
 
   def remove(groupKey: String, userId: String): Unit = {
