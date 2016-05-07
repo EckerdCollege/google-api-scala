@@ -2,7 +2,6 @@ package google.services.admin.directory.models
 
 import scala.language.implicitConversions
 import scala.language.postfixOps
-import scala.util.{Success, Failure, Try}
 /**
   * Created by davenpcm on 5/6/16.
   */

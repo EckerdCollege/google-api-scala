@@ -1,8 +1,7 @@
 package google.services.admin.directory
 
 import google.services.admin.directory.models.Group
-import com.google.api.services.admin.directory.model.Groups
-import collection.JavaConverters._
+
 import scala.annotation.tailrec
 
 /**
@@ -26,6 +25,8 @@ case class groups(directory: Directory) {
            pageToken: String = "",
            groups: List[Group] = List[Group]()
           ): List[Group] ={
+    import com.google.api.services.admin.directory.model.Groups
+    import collection.JavaConverters._
 
     val result = service.groups()
       .list()

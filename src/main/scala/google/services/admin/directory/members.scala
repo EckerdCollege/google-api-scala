@@ -2,8 +2,7 @@ package google.services.admin.directory
 
 import google.services.admin.directory.models.Member
 import google.services.admin.directory.models.Group
-import com.google.api.services.admin.directory.model.Members
-import scala.collection.JavaConverters._
+
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
 
@@ -29,7 +28,8 @@ class members(directory: Directory) {
            pageToken: String = "",
            members: List[Member] = List[Member]()
           ): Either[Throwable, List[Member]] = {
-  import scala.collection.JavaConverters._
+    import scala.collection.JavaConverters._
+    import com.google.api.services.admin.directory.model.Members
     
     val resultTry = Try(
       service.members()

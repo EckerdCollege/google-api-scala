@@ -1,10 +1,8 @@
 package google.services.admin.directory
 
-import google.services.admin.directory.models._
-import com.google.api.services.admin.directory.model.Users
+import google.services.admin.directory.models.{User, Email, Name}
 
 import scala.annotation.tailrec
-import collection.JavaConverters._
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
@@ -27,6 +25,8 @@ class users(directory: Directory) {
     */
   @tailrec
   final def list(pageToken: String = "", users: List[User] = List[User]()): List[User] = {
+    import com.google.api.services.admin.directory.model.Users
+    import collection.JavaConverters._
 
     val result = service.users()
       .list()
@@ -78,6 +78,8 @@ class users(directory: Directory) {
                                          pageToken: String = "",
                                          transformed: => List[T] = List[T]()
                                         )(f: User => T): List[T] = {
+    import com.google.api.services.admin.directory.model.Users
+    import collection.JavaConverters._
 
     val result = service.users()
       .list()
