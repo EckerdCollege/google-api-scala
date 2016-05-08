@@ -258,7 +258,7 @@ object JavaConversions {
     if (b.startTime isDefined){ event.setStart(b.startTime.get) }
     if (b.endTime isDefined) { event.setEnd(b.endTime.get) }
     if (b.recurrence isDefined){ event.setRecurrence(b.recurrence.get.asJava) }
-
+    if (b.id isDefined){ event.setId(b.id.get)}
     event
   }
 
@@ -279,7 +279,8 @@ object JavaConversions {
       Option(b.getAttendees)
         .map(attendees => attendees.asScala.toList)
         .map(listOfAttendees => listOfAttendees.map(_.getEmail)),
-      Option(b.getRecurrence).map(_.asScala.toList)
+      Option(b.getRecurrence).map(_.asScala.toList),
+      Option(b.getId)
     )
   }
 
