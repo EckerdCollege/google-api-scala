@@ -1,23 +1,36 @@
 package google.services.drive
 
 import google.services.Service
+
 import language.implicitConversions
 
 /**
   * Created by davenpcm on 5/5/16.
   */
-case class Drive(service: Service) {
-  val drive = new com.google.api.services.drive.Drive.Builder(service.httpTransport, service.jsonFactory, service.credential)
-    .setApplicationName(service.applicationName)
-    .setHttpRequestInitializer(service.credential)
-    .build()
+case class Drive(serviceAccountEmail: String,
+                 impersonatedEmail: String,
+                 credentialFilePath: String,
+                 applicationName: String,
+                 scopes: List[String]
+                ) extends Service(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes) {
 
   val files = new files(this)
   val permissions = new permissions(this)
 
 }
+
 object Drive {
-  implicit def toGoogleApi(drive: Drive): com.google.api.services.drive.Drive = {
-    drive.drive
+  def apply(serviceAccountEmail: String,
+            credentialFilePath: String,
+            applicationName: String,
+            scopes: List[String])(impersonator: String): Drive = {
+    apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, scopes)
+  }
+
+  def apply(serviceAccountEmail: String,
+            credentialFilePath: String,
+            applicationName: String,
+            scope: String)(impersonator: String): Drive = {
+    apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, List(scope))
   }
 }

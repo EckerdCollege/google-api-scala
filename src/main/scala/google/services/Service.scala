@@ -3,14 +3,10 @@ package google.services
 import com.google.api.client.googleapis.auth.oauth2.{GoogleClientSecrets, GoogleCredential}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
-import google.services.admin.directory.Directory
-import google.services.calendar.Calendar
-import google.services.drive.Drive
-
 /**
   * Created by davenpcm on 5/3/16.
   */
-case class Service( serviceAccountEmail: String,
+abstract class Service( serviceAccountEmail: String,
                impersonatedEmail: String,
                credentialFilePath: String,
                applicationName: String,
@@ -21,9 +17,6 @@ case class Service( serviceAccountEmail: String,
   val jsonFactory = new JacksonFactory
   val credential = getCredential(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
 
-  lazy val Directory = new Directory(this)
-  lazy val Calendar = new Calendar(this)
-  lazy val Drive = new Drive(this)
 
 
   private def getCredential(serviceAccountEmail: String,
@@ -65,24 +58,6 @@ case class Service( serviceAccountEmail: String,
     }
 
     credential
-  }
-
-}
-
-object Service {
-
-  def apply(serviceAccountEmail: String,
-              credentialFilePath: String,
-              applicationName: String,
-              scopes: List[String])(impersonator: String): Service = {
-      apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, scopes)
-  }
-
-  def apply(serviceAccountEmail: String,
-            credentialFilePath: String,
-            applicationName: String,
-            scope: String)(impersonator: String): Service = {
-    apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, List(scope))
   }
 
 }

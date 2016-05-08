@@ -23,6 +23,13 @@ import scala.collection.JavaConverters._
 
 class serviceSpec extends FlatSpec with Matchers {
 
+  case class service ( serviceAccountEmail: String,
+                       impersonatedEmail: String,
+                       credentialFilePath: String,
+                       applicationName: String,
+                       scopes: List[String]
+                     ) extends Service(serviceAccountEmail, impersonatedEmail, credentialFilePath, applicationName, scopes)
+
   val config = ConfigFactory.load().getConfig("googleTest")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
@@ -39,14 +46,13 @@ class serviceSpec extends FlatSpec with Matchers {
     GmailScopes.GMAIL_COMPOSE
   )
 
-  def serviceFixture = Service(serviceAccountEmail,
+  def serviceFixture = service(serviceAccountEmail,
       adminImpersonatedEmail,
       credentialFilePath,
       applicationName,
       ListScopes
     )
 
-  def partialServiceFixture = Service(serviceAccountEmail, credentialFilePath,applicationName,ListScopes)(_)
 
 
   "A Service" should "be returned from creating new service" in {
@@ -57,7 +63,7 @@ class serviceSpec extends FlatSpec with Matchers {
   it should "throw an error on a nonsense user" in {
     val nonsense = "kajsdf91234k;jefasdf"
     intercept[TokenResponseException]{
-      Service(serviceAccountEmail, nonsense, credentialFilePath, applicationName, ListScopes)
+      service(serviceAccountEmail, nonsense, credentialFilePath, applicationName, ListScopes)
     }
   }
 
@@ -69,21 +75,6 @@ class serviceSpec extends FlatSpec with Matchers {
   it should "have a transport layer" in {
     val s = serviceFixture
     s.httpTransport shouldBe a [NetHttpTransport]
-  }
-
-  it should "be able to generate a Directory" in {
-    val s = serviceFixture
-    s.Directory shouldBe a [Directory]
-  }
-
-  it should "be able to generate a Drive" in {
-    val s = serviceFixture
-    s.Drive shouldBe a [Drive]
-  }
-
-  it should "be able to generate a Calendar" in {
-    val s = serviceFixture
-    s.Calendar shouldBe a [Calendar]
   }
 
   "A Credential" should "be contained in a new service" in {
@@ -104,28 +95,6 @@ class serviceSpec extends FlatSpec with Matchers {
   it should "have a service account Id match the email" in {
     val s = serviceFixture
     s.credential.getServiceAccountId === serviceAccountEmail
-  }
-
-  "The Companion Object" should "be able to generate a partial function for impersonating users" in {
-    val f = partialServiceFixture
-    f shouldBe a [(String => Service)]
-  }
-
-  it should "be able to generate a Service" in {
-    val f = partialServiceFixture
-    f(adminImpersonatedEmail) shouldBe a [Service]
-  }
-
-  it should "throw and error on a nonsense impersonation email" in {
-    val f = partialServiceFixture
-    intercept[TokenResponseException]{
-      f("askjdfaksdf;jask23")
-    }
-  }
-
-  it should "be able to generate an identical service as a full apply" in {
-    val f = partialServiceFixture
-    f(adminImpersonatedEmail) === serviceFixture
   }
 
 }

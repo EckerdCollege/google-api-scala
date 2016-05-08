@@ -50,6 +50,14 @@ object JavaConverters {
     new AsScala(javaUserAsScalaUserConversion(b))
   }
 
+  implicit def scalaListUserAsJavaUsersConverter(b: List[sDirectory.models.User]): AsJava[jDirectory.model.Users] = {
+    new AsJava(scalaListUserAsJavaUsersConversion(b))
+  }
+
+  implicit def javaUsersAsScalaListUserConverter(b: jDirectory.model.Users): AsScala[List[sDirectory.models.User]] = {
+    new AsScala(javaUsersAsScalaListUserConversion(b))
+  }
+
   implicit def scalaNameAsJavaUserNameConverter(b: sDirectory.models.Name): AsJava[jDirectory.model.UserName] = {
     new AsJava(scalaNameAsJavaUserNameConversion(b))
   }
@@ -64,6 +72,49 @@ object JavaConverters {
 
   implicit def javaUserEmailAsScalaEmailConverter(b: jDirectory.model.UserEmail): AsScala[sDirectory.models.Email] = {
     new AsScala(javaUserEmailAsScalaEmailConversion(b))
+  }
+
+  implicit def scalaDriveAsJavaDriveConverter(b: sDrive.Drive): AsJava[jDrive.Drive] = {
+    new AsJava(scalaDriveAsJavaDriveConversion(b))
+  }
+
+  implicit def scalaFileAsJavaFileConverter(b: sDrive.models.File): AsJava[jDrive.model.File] = {
+    new AsJava(scalaFileAsJavaFileConversion(b))
+  }
+
+  implicit def javaFileAsScalaFileConverter(b: jDrive.model.File): AsScala[sDrive.models.File] = {
+    new AsScala(javaFileAsScalaFileConversion(b))
+  }
+
+  implicit def scalaListFileAsJavaFileListConverter(b: List[sDrive.models.File]): AsJava[jDrive.model.FileList] = {
+    new AsJava(scalaListFileAsJavaFileListConversion(b))
+  }
+
+  implicit def javaFileListAsScalaListFileConverter(b: jDrive.model.FileList): AsScala[List[sDrive.models.File]] = {
+    new AsScala(javaFileListAsScalaListFileConversion(b))
+  }
+
+  implicit def scalaFileContentAsJavaFileContentConverter(b: sDrive.models.FileContent)
+  : AsJava[com.google.api.client.http.FileContent] = {
+    new AsJava(scalaFileContentAsJavaFileContentConversion(b))
+  }
+
+  implicit def scalaPermissionAsJavaPermissionConverter(b: sDrive.models.Permission):AsJava[jDrive.model.Permission] ={
+    new AsJava(scalaPermissionAsJavaPermissionConversion(b))
+  }
+
+  implicit def javaPermissionAsScalaPermissionConverter(b: jDrive.model.Permission):AsScala[sDrive.models.Permission] ={
+    new AsScala(javaPermissionAsScalaPermissionConversion(b))
+  }
+
+  implicit def scalaListPermissionAsJavaPermissionsListConverter(b: List[sDrive.models.Permission])
+  : AsJava[jDrive.model.PermissionList] = {
+    new AsJava(scalaListPermissionAsJavaPermissionsListConversion(b))
+  }
+
+  implicit def javaPermissionsListAsScalaListPermissionConverter(b: jDrive.model.PermissionList)
+  : AsScala[List[sDrive.models.Permission]] = {
+    new AsScala(javaPermissionsListAsScalaListPermissionsConversion(b))
   }
 
 

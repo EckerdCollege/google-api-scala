@@ -14,11 +14,11 @@ object JavaConversions {
 
   implicit def scalaDirectoryAsJavaDirectoryConversion(b: sDirectory.Directory): jDirectory.Directory = {
     new com.google.api.services.admin.directory.Directory.Builder(
-      b.service.httpTransport,
-      b.service.jsonFactory,
-      b.service.credential)
-      .setApplicationName(b.service.applicationName)
-      .setHttpRequestInitializer(b.service.credential)
+      b.httpTransport,
+      b.jsonFactory,
+      b.credential)
+      .setApplicationName(b.applicationName)
+      .setHttpRequestInitializer(b.credential)
       .build()
   }
 
@@ -106,6 +106,18 @@ object JavaConversions {
     )
   }
 
+  implicit def scalaListUserAsJavaUsersConversion(b: List[sDirectory.models.User]): jDirectory.model.Users = {
+    import scala.collection.JavaConverters._
+    val users = b.map(scalaUserAsJavaUserConversion(_)).asJava
+    new jDirectory.model.Users()
+      .setUsers(users)
+  }
+
+  implicit def javaUsersAsScalaListUserConversion(b: jDirectory.model.Users): List[sDirectory.models.User] = {
+    import scala.collection.JavaConverters._
+    b.getUsers.asScala.toList.map(javaUserAsScalaUserConversion)
+  }
+
   implicit def scalaNameAsJavaUserNameConversion(name: sDirectory.models.Name): jDirectory.model.UserName = {
     new com.google.api.services.admin.directory.model.UserName()
       .setGivenName(name.givenName)
@@ -130,6 +142,95 @@ object JavaConversions {
       userEmail.getAddress,
       userEmail.getPrimary
     )
+  }
+
+  implicit def scalaDriveAsJavaDriveConversion(b: sDrive.Drive): jDrive.Drive = {
+    new com.google.api.services.drive.Drive.Builder(
+      b.httpTransport,
+      b.jsonFactory,
+      b.credential)
+      .setApplicationName(b.applicationName)
+      .setHttpRequestInitializer(b.credential)
+      .build()
+  }
+
+  implicit def scalaFileContentAsJavaFileContentConversion(fileContent: sDrive.models.FileContent)
+  : com.google.api.client.http.FileContent = {
+    new com.google.api.client.http.FileContent(fileContent.mimeType, fileContent.content)
+  }
+
+  implicit def scalaFileAsJavaFileConversion(file: sDrive.models.File): jDrive.model.File = {
+    import scala.collection.JavaConverters._
+    val metadata = new com.google.api.services.drive.model.File()
+      .setName(file.name)
+      .setMimeType(file.mimeType)
+    if (file.id isDefined) { metadata.setId(file.id.get)}
+    if (file.extension isDefined){ metadata.setFileExtension(file.extension.get)}
+    if (file.description isDefined){ metadata.setDescription(file.description.get)}
+    if (file.parentIds isDefined){ metadata.setParents(file.parentIds.get.asJava)}
+    metadata
+  }
+
+  implicit def javaFileAsScalaFileConversion(file: jDrive.model.File): sDrive.models.File = {
+    import scala.collection.JavaConverters._
+    sDrive.models.File(
+      file.getName,
+      file.getMimeType,
+      Option(file.getId),
+      Option(file.getFileExtension),
+      Option(file.getDescription),
+      Option(file.getParents).map(_.asScala.toList)
+    )
+  }
+
+  implicit def scalaListFileAsJavaFileListConversion(b: List[sDrive.models.File]): jDrive.model.FileList = {
+    import collection.JavaConverters._
+    val files = b.map(scalaFileAsJavaFileConversion).asJava
+    new jDrive.model.FileList()
+      .setFiles(files)
+  }
+
+  implicit def javaFileListAsScalaListFileConversion(b: jDrive.model.FileList): List[sDrive.models.File] = {
+    import collection.JavaConverters._
+    b.getFiles.asScala.toList.map(javaFileAsScalaFileConversion)
+  }
+
+  implicit def scalaPermissionAsJavaPermissionConversion(permission: sDrive.models.Permission)
+  : jDrive.model.Permission = {
+
+    val Permission = new com.google.api.services.drive.model.Permission()
+      .setRole(permission.role)
+      .setType(permission.permissionType)
+
+    if (permission.emailAddress isDefined){ Permission.setEmailAddress(permission.emailAddress.get) }
+    if (permission.displayName isDefined){ Permission.setDisplayName(permission.displayName.get) }
+    if (permission.id isDefined) { Permission.setId(permission.id.get)}
+    Permission
+  }
+
+  implicit def javaPermissionAsScalaPermissionConversion(permission: jDrive.model.Permission)
+  : sDrive.models.Permission = {
+    sDrive.models.Permission(
+      permission.getRole,
+      permission.getType,
+      Option(permission.getEmailAddress),
+      Option(permission.getDisplayName),
+      Option(permission.getId)
+    )
+  }
+
+  implicit def scalaListPermissionAsJavaPermissionsListConversion(b: List[sDrive.models.Permission])
+  : jDrive.model.PermissionList = {
+    import scala.collection.JavaConverters._
+    val javaPermissions = b.map(scalaPermissionAsJavaPermissionConversion)
+    new jDrive.model.PermissionList()
+      .setPermissions(javaPermissions.asJava)
+  }
+
+  implicit def javaPermissionsListAsScalaListPermissionsConversion(b: jDrive.model.PermissionList)
+  : List[sDrive.models.Permission] = {
+    import scala.collection.JavaConverters._
+    b.getPermissions.asScala.toList.map(javaPermissionAsScalaPermissionConversion)
   }
 
 

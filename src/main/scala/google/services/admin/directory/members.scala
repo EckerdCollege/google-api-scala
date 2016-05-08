@@ -4,7 +4,6 @@ import google.services.admin.directory.models.Member
 import google.services.admin.directory.models.Group
 
 import scala.annotation.tailrec
-import scala.util.{Failure, Success, Try}
 import google.services.JavaConverters._
 import language.implicitConversions
 import language.postfixOps

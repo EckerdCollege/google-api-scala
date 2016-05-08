@@ -1,7 +1,8 @@
 
 import com.typesafe.config.ConfigFactory
 import scripts.GooglePhotos
-import google.services.Service
+import google.services.drive.Drive
+import google.services.admin.directory.Directory
 import google.services.Scopes.DRIVE
 import google.services.Scopes.ADMIN_DIRECTORY
 import google.services.admin.directory.models.{Email, Name, User}
@@ -14,28 +15,30 @@ import google.services.drive.models.File
 object CommandLine extends App{
 
 
-  val scope = ADMIN_DIRECTORY
+  val scope = ADMIN_DIRECTORY ::: DRIVE
   val config = ConfigFactory.load().getConfig("google")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
   val applicationName = config.getString("applicationName")
   val adminImpersonatedEmail = config.getString("impersonatedEmail")
 
-  val pluggableService = Service(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
+  val pluggableDrive = Drive(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
+  val pluggableDirectory = Directory(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
 //  val myDrive = pluggableService("davenpcm@eckerd.edu").Drive
 //
 //  val Files = myDrive.files.list().take(100)
 //  val Permissions = Files.map(file => myDrive.permissions.list(file.id.get))
 //  Files.foreach(println)
 //  Permissions.foreach(println)
-  val dir = pluggableService(adminImpersonatedEmail).Directory
-  val users = dir.users.list()
-  val groups = dir.groups.list()
+//  val dir = pluggableDrive("davenpcm@eckerd.edu").files.list.foreach(println)
 
-  users.foreach(println)
-  groups.foreach(println)
-  println(users.length)
-  println(groups.length)
+  val groups = pluggableDirectory(adminImpersonatedEmail).users.list().foreach(println)
+//  val groups = dir.groups.list()
+
+//  users.foreach(println)
+//  groups.foreach(println)
+//  println(users.length)
+//  println(groups.length)
 
 
 //  val Folders = Files.filter(_.mimeType == "application/vnd.google-apps.folder")

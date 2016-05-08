@@ -29,12 +29,12 @@ class groupsSpec extends FlatSpec with Matchers {
     GmailScopes.GMAIL_COMPOSE
   )
 
-  def groupFixture = google.services.Service(serviceAccountEmail,
+  def groupFixture = google.services.admin.directory.Directory(serviceAccountEmail,
     adminImpersonatedEmail,
     credentialFilePath,
     applicationName,
     ListScopes
-  ).Directory.groups
+  ).groups
 
 
 

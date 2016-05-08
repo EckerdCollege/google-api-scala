@@ -28,8 +28,6 @@ class users(directory: Directory) {
   def list(domain: String = "eckerd.edu", orderBy: String = "email", resultsPerPage: Int = 500): List[User] = {
     @tailrec
     def list(pageToken: String = "", users: List[User] = List[User]()): List[User] = {
-      import com.google.api.services.admin.directory.model.Users
-      import collection.JavaConverters._
 
       val result = service.users()
         .list()
@@ -39,15 +37,12 @@ class users(directory: Directory) {
         .setPageToken(pageToken)
         .execute()
 
-      val typedList = List[Users](result)
-        .map(users => users.getUsers)
-        .map { javaList => javaList.asScala.toList }
-        .foldLeft(List[User]())((acc, listUsers) => listUsers.map(_.asScala) ::: acc)
+      val typedList = result.asScala.reverse
 
       val myList = typedList ::: users
 
       val nextPageToken = result.getNextPageToken
-      if (nextPageToken != null && result.getUsers != null) list(nextPageToken, myList) else myList
+      if (nextPageToken != null && result.getUsers != null) list(nextPageToken, myList) else myList.reverse
 
     }
     list()
@@ -84,28 +79,21 @@ class users(directory: Directory) {
                                  pageToken: String = "",
                                  transformed: => List[T] = List[T]()
                                   ): List[T] = {
-      import com.google.api.services.admin.directory.model.Users
-      import collection.JavaConverters._
 
-      val result = service.users()
-        .list()
+      val result = service.users().list()
         .setDomain(domain)
         .setMaxResults(resultsPerPage)
         .setOrderBy(orderBy)
         .setPageToken(pageToken)
         .execute()
 
-      lazy val typedList = List[Users](result)
-        .map(users => users.getUsers)
-        .map { javaList => javaList.asScala.toList }
-        .foldLeft(List[User]())((acc, listUsers) => listUsers.map(_.asScala) ::: acc)
-        .map(user => f(user))
+      val typed = result.asScala.map(f).reverse
 
-      lazy val list: List[T] = typedList ::: transformed
+      lazy val list: List[T] = typed ::: transformed
 
       val nextPageToken = result.getNextPageToken
 
-      if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(nextPageToken, list) else list
+      if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(nextPageToken, list) else list.reverse
     }
     transformAllGoogleUsers()
   }
@@ -136,6 +124,5 @@ class users(directory: Directory) {
   def update(user: User): User = {
     service.users().update(user.id.get, user.asJava).execute().asScala
   }
-
 
 }
