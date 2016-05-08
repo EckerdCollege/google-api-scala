@@ -4,6 +4,8 @@ import google.services.admin.{directory => sDirectory}
 import com.google.api.services.admin.{directory => jDirectory}
 import google.services.{drive => sDrive}
 import com.google.api.services.{drive => jDrive}
+import google.services.{calendar => sCalendar}
+import com.google.api.services.{calendar => jCalendar}
 import scala.language.implicitConversions
 import scala.language.postfixOps
 
@@ -231,6 +233,13 @@ object JavaConversions {
   : List[sDrive.models.Permission] = {
     import scala.collection.JavaConverters._
     b.getPermissions.asScala.toList.map(javaPermissionAsScalaPermissionConversion)
+  }
+
+  implicit def scalaCalendarAsJavaCalendarConversion(service: sCalendar.Calendar): jCalendar.Calendar = {
+    new com.google.api.services.calendar.Calendar.Builder(service.httpTransport, service.jsonFactory, service.credential)
+      .setApplicationName(service.applicationName)
+      .setHttpRequestInitializer(service.credential)
+      .build()
   }
 
 

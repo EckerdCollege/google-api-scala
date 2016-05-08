@@ -5,7 +5,9 @@ import google.services.drive.Drive
 import google.services.admin.directory.Directory
 import google.services.Scopes.DRIVE
 import google.services.Scopes.ADMIN_DIRECTORY
+import google.services.Scopes.CALENDAR
 import google.services.admin.directory.models.{Email, Name, User}
+import google.services.calendar.Calendar
 import google.services.drive.models.File
 
 
@@ -15,7 +17,7 @@ import google.services.drive.models.File
 object CommandLine extends App{
 
 
-  val scope = ADMIN_DIRECTORY ::: DRIVE
+  val scope = ADMIN_DIRECTORY ::: DRIVE ::: List(CALENDAR)
   val config = ConfigFactory.load().getConfig("google")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
@@ -24,6 +26,7 @@ object CommandLine extends App{
 
   val pluggableDrive = Drive(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
   val pluggableDirectory = Directory(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
+  val pluggableCalendar = Calendar(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
 //  val myDrive = pluggableService("davenpcm@eckerd.edu").Drive
 //
 //  val Files = myDrive.files.list().take(100)
@@ -31,8 +34,9 @@ object CommandLine extends App{
 //  Files.foreach(println)
 //  Permissions.foreach(println)
 //  val dir = pluggableDrive("davenpcm@eckerd.edu").files.list.foreach(println)
+  val cal = pluggableCalendar("davenpcm@eckerd.edu").events.list.foreach(println)
 
-  val groups = pluggableDirectory(adminImpersonatedEmail).users.list().foreach(println)
+//  val groups = pluggableDirectory(adminImpersonatedEmail).users.list().foreach(println)
 //  val groups = dir.groups.list()
 
 //  users.foreach(println)

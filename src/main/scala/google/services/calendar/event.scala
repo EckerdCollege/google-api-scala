@@ -2,14 +2,14 @@ package google.services.calendar
 
 import com.google.api.client.util.DateTime
 import com.google.api.services.calendar.model.{Event, EventAttendee, EventDateTime}
-
+import google.services.JavaConverters._
 import scala.collection.JavaConverters._
 
 /**
   * Created by davenpcm on 5/3/16.
   */
 class event(calendar: Calendar) {
-  val service = calendar.calendar
+  val service = calendar.asJava
 
   def list: List[Event] = {
     val now = new DateTime(System.currentTimeMillis())
