@@ -1,14 +1,15 @@
 
+
+
 import com.typesafe.config.ConfigFactory
-import scripts.GooglePhotos
 import google.services.drive.Drive
 import google.services.admin.directory.Directory
 import google.services.Scopes.DRIVE
 import google.services.Scopes.ADMIN_DIRECTORY
 import google.services.Scopes.CALENDAR
-import google.services.admin.directory.models.{Email, Name, User}
 import google.services.calendar.Calendar
-import google.services.drive.models.File
+import google.services.calendar.models.Event
+
 
 
 /**
@@ -17,7 +18,7 @@ import google.services.drive.models.File
 object CommandLine extends App{
 
 
-  val scope = ADMIN_DIRECTORY ::: DRIVE ::: List(CALENDAR)
+  val scope = CALENDAR :: DRIVE ::: ADMIN_DIRECTORY
   val config = ConfigFactory.load().getConfig("google")
   val serviceAccountEmail = config.getString("email")
   val credentialFilePath = config.getString("pkcs12FilePath")
@@ -27,14 +28,46 @@ object CommandLine extends App{
   val pluggableDrive = Drive(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
   val pluggableDirectory = Directory(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
   val pluggableCalendar = Calendar(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
-//  val myDrive = pluggableService("davenpcm@eckerd.edu").Drive
+
+  val myCal = pluggableCalendar("davenpcm@eckerd.edu")
+//  val events = myCal.events.list.map(_.copy(description = "")).foreach(println)
+
+  val myEvent = Event(
+    "Test Event",
+    "Description",
+    Some(java.time.ZonedDateTime.now().plusHours(1)),
+    Some(java.time.ZonedDateTime.now().plusHours(2))
+  )
+  println(myEvent)
+  val eventAdded = myCal.events.create(myEvent)
+  println(eventAdded)
+
+//  val myDrive = pluggableDrive("davenpcm@eckerd.edu")
+//  val Files = myDrive.files.list().foreach(println)
+//  val adminDir = pluggableDirectory(adminImpersonatedEmail)
+//  val Users = adminDir.users.list().foreach(println)
+//  val Groups = adminDir.groups.list().foreach(println)
+
+
+//  val localTime = java.time.LocalDateTime.of(2016, 5, 8, 11, 0)
+//  println(localTime)
+//  val zone = java.time.ZoneId.of("America/New_York")
+//  println(zone)
+//  val zonedTime = java.time.ZonedDateTime.of(localTime, zone)
+//  println(zonedTime)
 //
-//  val Files = myDrive.files.list().take(100)
+//
+//  println(zonedTime.getZone)
+//  println(zonedTime.getOffset)
+//  println(zonedTime.toOffsetDateTime)
+
+
+//  val time = new java.time.ZonedDateTime(localTime, )
+
 //  val Permissions = Files.map(file => myDrive.permissions.list(file.id.get))
 //  Files.foreach(println)
 //  Permissions.foreach(println)
 //  val dir = pluggableDrive("davenpcm@eckerd.edu").files.list.foreach(println)
-  val cal = pluggableCalendar("davenpcm@eckerd.edu").events.list.foreach(println)
 
 //  val groups = pluggableDirectory(adminImpersonatedEmail).users.list().foreach(println)
 //  val groups = dir.groups.list()
@@ -43,7 +76,6 @@ object CommandLine extends App{
 //  groups.foreach(println)
 //  println(users.length)
 //  println(groups.length)
-
 
 //  val Folders = Files.filter(_.mimeType == "application/vnd.google-apps.folder")
 //  val parent = Files.getOrElse(File("Lied To", "Majorly Fake"))
@@ -60,7 +92,6 @@ object CommandLine extends App{
 //  val FoldersWith1Parent = FolderWithParentsFound.filter(_.parentIds.get.length == 1)
 //  val FoldersWithNoParent = FolderWithParentsFound.filter(_.parentIds.get.length == 0)
 
-
 //  FoldersWithMoreThan1Parent.foreach(println)
 //  FoldersWith1Parent.foreach(println)
 //  FoldersWithNoParent.foreach(println)
@@ -68,14 +99,6 @@ object CommandLine extends App{
 //  println(FoldersWithMoreThan1Parent.length)
 //  println(FoldersWith1Parent.length)
 //  println(FoldersWithNoParent.length)
-
-
-
-
-
-
-
-
 
 //  val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
 //  val users = adminDirectory.users.list().map(user => user.primaryEmail.address -> user)(collection.breakOut): Map[String, User]
@@ -129,8 +152,6 @@ object CommandLine extends App{
 //  val DriveScope = DriveScopes.DRIVE
 //  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
 
-
-
 //  val service = google.services.service(
 //    serviceAccountEmail,
 //    adminImpersonatedEmail,
@@ -143,10 +164,7 @@ object CommandLine extends App{
 //
 //  println(credential.getServiceAccountId)
 
-
-
 //    val adminService = partial(adminImpersonatedEmail)
-
 
 //    val adminDirectory = pluggableService(adminImpersonatedEmail).Directory
 //    adminDirectory.users.list().foreach(println)
@@ -157,9 +175,6 @@ object CommandLine extends App{
 //    val Path = "/home/davenpcm/Downloads/temp/"
 //    randomFiles.foreach(println)
 //    randomFiles.par.foreach(_.download(Path, drive))
-
-
-
 
 //  val service = getCalendar(credential, applicationName)
 //
@@ -179,8 +194,6 @@ object CommandLine extends App{
 //  val mimeType = "image/png"
 //  val picturePath = "/home/davenpcm/Downloads/vim_cheat_sheet_for_programmers_print.png"
 //  val pictureName =  picturePath.substring(picturePath.lastIndexOf("/")+1)
-
-
 
 //  val permission = new Permission()
 //    .setEmailAddress("abneyfl@eckerd.edu")

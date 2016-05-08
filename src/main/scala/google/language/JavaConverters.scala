@@ -21,6 +21,10 @@ object JavaConverters {
     def asScala: C = op
   }
 
+  class AsGoogle[C](op: => C){
+    def asGoogle: C = op
+  }
+
   implicit def scalaDirectoryAsJavaDirectoryConverter(b: sDirectory.Directory): AsJava[jDirectory.Directory] = {
     new AsJava(scalaDirectoryAsJavaDirectoryConversion(b))
   }
@@ -119,6 +123,34 @@ object JavaConverters {
   implicit def scalaCalendarAsJavaCalendarConverter(b: sCalendar.Calendar): AsJava[jCalendar.Calendar] = {
     new AsJava(scalaCalendarAsJavaCalendarConversion(b))
   }
+
+  implicit def scalaEventAsJavaEventConverter(b: sCalendar.models.Event): AsJava[jCalendar.model.Event] = {
+    new AsJava(scalaEventAsJavaEventConversion(b))
+  }
+
+  implicit def javaEventAsScalaEventConverter(b: jCalendar.model.Event): AsScala[sCalendar.models.Event] = {
+    new AsScala(javaEventAsScalaEventConversion(b))
+  }
+
+  implicit def javaZonedDateTimeAsGoogleDateTimeConverter(b: java.time.ZonedDateTime)
+  : AsGoogle[com.google.api.client.util.DateTime] = {
+    new AsGoogle(javaZonedDateTimeAsGoogleDateTimeConversion(b))
+  }
+
+  implicit def googleDateTimeAsJavaZonedDateTimeConverter(b: com.google.api.client.util.DateTime)
+  : AsJava[java.time.ZonedDateTime] = {
+    new AsJava(googleDateTimeAsJavaZoneDateTimeConversion(b))
+  }
+
+//  implicit def javaZoneDateTimeAsGoogleEventDateTimeConverter(b: java.time.ZonedDateTime)
+//  : AsGoogle[jCalendar.model.EventDateTime] = {
+//    new AsGoogle(javaZonedDateTimeAsGoogleEventDateTimeConversion(b))
+//  }
+
+//  implicit def googleEventDateTimeAsJavaZonedDateTimeConverter(b: jCalendar.model.EventDateTime)
+//  : AsJava[java.time.ZonedDateTime] = {
+//    new AsJava(googleEventDateTimeAsJavaZonedDateTimeConversion(b))
+//  }
 
 
 }

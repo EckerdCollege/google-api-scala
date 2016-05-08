@@ -240,5 +240,78 @@ object JavaConversions {
       .build()
   }
 
+  implicit def scalaEventAsJavaEventConversion(b: sCalendar.models.Event): jCalendar.model.Event = {
+    import collection.JavaConverters._
+    val event = new jCalendar.model.Event
+
+    val participants = b.participantEmails.map( participantEmail =>
+      new jCalendar.model.EventAttendee().setEmail(participantEmail)
+    ).asJava
+
+    event.setSummary(b.title)
+    event.setDescription(b.description)
+    event.setAttendees(participants)
+    if (b.startTime isDefined){ event.setStart(b.startTime.get) }
+    if (b.endTime isDefined) { event.setEnd(b.endTime.get) }
+    if (b.recurrence nonEmpty){ event.setRecurrence(b.recurrence.asJava) }
+
+    event
+  }
+
+  implicit def javaEventAsScalaEventConversion(b: jCalendar.model.Event): sCalendar.models.Event = {
+    import collection.JavaConverters._
+    sCalendar.models.Event(
+      b.getSummary,
+      b.getDescription,
+      {if (b.getStart.getDateTime != null)
+        Some(b.getStart.getDateTime)
+      else None },
+      {if (b.getEnd.getDateTime != null)
+        Some(b.getEnd.getDateTime)
+      else None },
+      Option(b.getAttendees)
+        .map(attendees => attendees.asScala.toList)
+        .map(listOfAttendees => listOfAttendees.map(_.getEmail))
+        .getOrElse(List[String]())
+
+        //
+//        .map(attendee => attendee.getEmail)
+//        .getOrElse(List[jCalendar.model.EventAttendee]().asJava)
+//        .asScala
+//        .toList
+//        .map(
+//          attendee =>
+//          Option(attendee.getEmail)
+//            .getOrElse(List[String]())
+//        )
+    )
+  }
+
+  implicit def javaZonedDateTimeAsGoogleDateTimeConversion(b: java.time.ZonedDateTime)
+  : com.google.api.client.util.DateTime = {
+
+    new com.google.api.client.util.DateTime(b.toOffsetDateTime.toString)
+  }
+
+  implicit def googleDateTimeAsJavaZoneDateTimeConversion(b: com.google.api.client.util.DateTime)
+  : java.time.ZonedDateTime = {
+    java.time.ZonedDateTime.parse(b.toStringRfc3339.toCharArray)
+  }
+
+  implicit def javaZonedDateTimeAsGoogleEventDateTimeConversion(b: java.time.ZonedDateTime)
+  : jCalendar.model.EventDateTime = {
+
+    new jCalendar.model.EventDateTime()
+      .setDateTime(b)
+      .setTimeZone(b.getZone.toString)
+  }
+
+  implicit def googleEventDateTimeAsJavaZonedDateTimeConversion(b: jCalendar.model.EventDateTime)
+  : java.time.ZonedDateTime = {
+
+    val formatter = java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    java.time.ZonedDateTime.parse(b.getDateTime.toStringRfc3339.toCharArray, formatter)
+  }
+
 
 }
