@@ -244,16 +244,20 @@ object JavaConversions {
     import collection.JavaConverters._
     val event = new jCalendar.model.Event
 
-    val participants = b.participantEmails.map( participantEmail =>
-      new jCalendar.model.EventAttendee().setEmail(participantEmail)
-    ).asJava
+
+    val participants = b.participantEmails
+      .map(
+        _.map(
+          email => new jCalendar.model.EventAttendee().setEmail(email)
+        )
+      )
 
     event.setSummary(b.title)
-    event.setDescription(b.description)
-    event.setAttendees(participants)
+    if (b.participantEmails isDefined) {event.setDescription(b.description.get)}
+    if (b.participantEmails isDefined) {event.setAttendees(participants.get.asJava)}
     if (b.startTime isDefined){ event.setStart(b.startTime.get) }
     if (b.endTime isDefined) { event.setEnd(b.endTime.get) }
-    if (b.recurrence nonEmpty){ event.setRecurrence(b.recurrence.asJava) }
+    if (b.recurrence isDefined){ event.setRecurrence(b.recurrence.get.asJava) }
 
     event
   }
@@ -262,28 +266,20 @@ object JavaConversions {
     import collection.JavaConverters._
     sCalendar.models.Event(
       b.getSummary,
-      b.getDescription,
+      {if(b.getDescription != "") Some(b.getDescription) else None},
+
       {if (b.getStart.getDateTime != null)
         Some(b.getStart.getDateTime)
       else None },
+
       {if (b.getEnd.getDateTime != null)
         Some(b.getEnd.getDateTime)
       else None },
+
       Option(b.getAttendees)
         .map(attendees => attendees.asScala.toList)
-        .map(listOfAttendees => listOfAttendees.map(_.getEmail))
-        .getOrElse(List[String]())
-
-        //
-//        .map(attendee => attendee.getEmail)
-//        .getOrElse(List[jCalendar.model.EventAttendee]().asJava)
-//        .asScala
-//        .toList
-//        .map(
-//          attendee =>
-//          Option(attendee.getEmail)
-//            .getOrElse(List[String]())
-//        )
+        .map(listOfAttendees => listOfAttendees.map(_.getEmail)),
+      Option(b.getRecurrence).map(_.asScala.toList)
     )
   }
 

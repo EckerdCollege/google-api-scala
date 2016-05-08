@@ -30,17 +30,17 @@ object CommandLine extends App{
   val pluggableCalendar = Calendar(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
 
   val myCal = pluggableCalendar("davenpcm@eckerd.edu")
-//  val events = myCal.events.list.map(_.copy(description = "")).foreach(println)
+  val events = myCal.events.list.foreach(println)
 
-  val myEvent = Event(
-    "Test Event",
-    "Description",
-    Some(java.time.ZonedDateTime.now().plusHours(1)),
-    Some(java.time.ZonedDateTime.now().plusHours(2))
-  )
-  println(myEvent)
-  val eventAdded = myCal.events.create(myEvent)
-  println(eventAdded)
+//  val myEvent = Event(
+//    "Test Event",
+//    "Description",
+//    Some(java.time.ZonedDateTime.now().plusHours(1)),
+//    Some(java.time.ZonedDateTime.now().plusHours(2))
+//  )
+//  println(myEvent)
+//  val eventAdded = myCal.events.create(myEvent)
+//  println(eventAdded)
 
 //  val myDrive = pluggableDrive("davenpcm@eckerd.edu")
 //  val Files = myDrive.files.list().foreach(println)
