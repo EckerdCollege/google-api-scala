@@ -1,8 +1,9 @@
 package google.services.admin.directory
 
 import com.google.api.services.admin.directory.model.UserPhoto
-import google.services.JavaConverters._
-import scala.util.{Failure, Success, Try}
+import google.language.JavaConverters._
+
+import scala.util.Try
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -10,14 +11,11 @@ import scala.util.{Failure, Success, Try}
 class photos(directory: Directory) {
   private val service = directory.asJava
 
-  def get(userKey: String): Either[Throwable, UserPhoto] = {
+  def get(userKey: String): Try[UserPhoto] = {
 
-    val returnType = Try( service.users().photos().get(userKey).execute() )
+    val returnType: Try[UserPhoto] = Try( service.users().photos().get(userKey).execute() )
 
-    returnType match {
-      case Success(value) => Right(value)
-      case Failure(exception) => Left(exception)
-    }
+    returnType
   }
 
 }

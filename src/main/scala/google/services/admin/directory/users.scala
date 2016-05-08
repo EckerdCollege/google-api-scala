@@ -1,13 +1,15 @@
 package google.services.admin.directory
 
-import google.services.admin.directory.models.{User, Email, Name}
+import google.language.JavaConverters._
+import google.services.admin.directory.models.{Email, Name, User}
+
 import scala.language.implicitConversions
 import scala.language.postfixOps
 import scala.annotation.tailrec
 import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
-import google.services.JavaConverters._
+
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -16,7 +18,7 @@ class users(directory: Directory) {
 
   private val service = directory.asJava
 
-
+  val photos = new photos(directory)
 
   /**
     * This is a simple user accumulation function that collects all users in eckerd. It does no additional modification

@@ -1,6 +1,8 @@
 package google.services.drive
 
-import google.services.JavaConverters._
+
+import google.language.JavaConverters._
+
 import language.implicitConversions
 import language.postfixOps
 import models._

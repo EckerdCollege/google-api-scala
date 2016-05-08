@@ -1,10 +1,12 @@
 package google.services.drive
 
+import google.language.JavaConverters
 import models._
+
 import language.implicitConversions
 import language.postfixOps
 import scala.annotation.tailrec
-import google.services.JavaConverters._
+import JavaConverters._
 
 
 /**
@@ -14,7 +16,7 @@ class files(drive: Drive) {
 
   private val service = drive.asJava
 
-  def list : List[File] = {
+  def list() : List[File] = {
     @tailrec
     def list(pageToken: String = "", files: List[File] = List[File]()): List[File] = {
 

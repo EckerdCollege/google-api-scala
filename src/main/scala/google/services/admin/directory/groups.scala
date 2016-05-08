@@ -1,7 +1,7 @@
 package google.services.admin.directory
 
-import google.services.admin.directory.models.Group
-import google.services.JavaConverters._
+import google.language.JavaConverters._
+import models.Group
 import scala.annotation.tailrec
 
 /**

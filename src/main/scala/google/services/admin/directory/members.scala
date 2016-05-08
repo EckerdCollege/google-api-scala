@@ -2,11 +2,11 @@ package google.services.admin.directory
 
 import google.services.admin.directory.models.Member
 import google.services.admin.directory.models.Group
+import google.language.JavaConverters._
 
-import scala.annotation.tailrec
-import google.services.JavaConverters._
 import language.implicitConversions
 import language.postfixOps
+import scala.annotation.tailrec
 
 /**
   * Created by davenpcm on 5/3/16.

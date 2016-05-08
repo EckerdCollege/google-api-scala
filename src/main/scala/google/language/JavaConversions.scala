@@ -1,13 +1,11 @@
-package google.services
+package google.language
 
-import google.services.admin.{directory => sDirectory}
 import com.google.api.services.admin.{directory => jDirectory}
-import google.services.{drive => sDrive}
-import com.google.api.services.{drive => jDrive}
-import google.services.{calendar => sCalendar}
-import com.google.api.services.{calendar => jCalendar}
-import scala.language.implicitConversions
-import scala.language.postfixOps
+import com.google.api.services.{calendar => jCalendar, drive => jDrive}
+import google.services.admin.{directory => sDirectory}
+import google.services.{calendar => sCalendar, drive => sDrive}
+
+import scala.language.{implicitConversions, postfixOps}
 
 /**
   * Created by davenpcm on 5/7/16.

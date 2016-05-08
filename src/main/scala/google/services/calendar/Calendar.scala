@@ -17,7 +17,7 @@ case class Calendar(serviceAccountEmail: String,
   credentialFilePath,
   applicationName,
   scopes) {
-  val events = new event(this)
+  val events = new events(this)
 }
 
 object Calendar {
