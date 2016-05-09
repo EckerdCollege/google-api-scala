@@ -5,6 +5,7 @@ import google.services.admin.directory.Directory
 import com.google.api.services.admin.directory.model.User
 import com.google.common.io.BaseEncoding
 import persistence.entities.representations.Image
+import scala.util.{Success, Failure}
 
 /**
   * Created by davenpcm on 4/27/16.
@@ -69,13 +70,13 @@ object GooglePhotos {
     def convertUserToImage(user: User, service: Directory): Option[Image] = {
       val userPhoto = service.photos.get(user.getId)
       userPhoto match {
-        case Right(photo) =>
+        case Success(photo) =>
           val extension = mimeTypeToExtension(photo.getMimeType)
           val byteArray = convertToImage(getBase64CssImage(photo.getPhotoData))
           val parsedFolder = parseOutputFolder(outputFolder)
           val image = Image(s"$parsedFolder$id$extension", byteArray)
           Some(image)
-        case Left(error) => {println(error); None}
+        case Failure(error) =>  println(error); None
       }
     }
 
@@ -104,7 +105,7 @@ object GooglePhotos {
     * @return A Sequence for all google users of the user id and the option of an image created.
     */
   def getAllGoogleImages( outputFolder: String, service: Directory): Seq[(User, Option[Image])] = {
-    import google.services.JavaConverters._
+    import google.language.JavaConverters._
     val users = service.users.list()
 
     val photos = users

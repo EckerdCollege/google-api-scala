@@ -1,6 +1,3 @@
-
-
-
 import com.typesafe.config.ConfigFactory
 import google.services.drive.Drive
 import google.services.admin.directory.Directory
@@ -9,14 +6,15 @@ import google.services.Scopes.ADMIN_DIRECTORY
 import google.services.Scopes.CALENDAR
 import google.services.calendar.Calendar
 import google.services.calendar.models.Event
-
-
+import scripts.DeleteOldGroups
+import utils.configuration.ConfigurationModuleImpl
+import utils.persistence.PersistenceModuleImpl
 
 /**
   * Created by davenpcm on 5/3/16.
   */
 object CommandLine extends App{
-
+  val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
 
   val scope = CALENDAR :: DRIVE ::: ADMIN_DIRECTORY
   val config = ConfigFactory.load().getConfig("google")
@@ -29,8 +27,28 @@ object CommandLine extends App{
   val pluggableDirectory = Directory(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
   val pluggableCalendar = Calendar(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
 
-  val myCal = pluggableCalendar("davenpcm@eckerd.edu")
-  val events = myCal.events.list.foreach(println)
+
+
+  val adminDir = pluggableDirectory(adminImpersonatedEmail)
+//  val myCal = pluggableCalendar("davenpcm@eckerd.edu")
+//  val myDrive = pluggableDrive("davenpcm@eckerd.edu")
+
+  DeleteOldGroups.deleteTermCourses("201430", modules.dbConfig, adminDir)
+
+
+//  val groups = adminDir.groups.list()
+//  val bannerhelp = groups.find(_.name == "bannerhelp")
+//
+//  val bannerhelp2 = adminDir.groups.get(bannerhelp.get.id.get)
+//  println(bannerhelp)
+//  println(bannerhelp2)
+
+
+//  val Users = adminDir.users.list().foreach(println)
+//  val Groups = adminDir.groups.list().foreach(println)
+//  val events = myCal.events.list.foreach(println)
+//  val Files = myDrive.files.list().foreach(println)
+
 
 //  val myEvent = Event(
 //    "Test Event",
@@ -42,11 +60,7 @@ object CommandLine extends App{
 //  val eventAdded = myCal.events.create(myEvent)
 //  println(eventAdded)
 
-//  val myDrive = pluggableDrive("davenpcm@eckerd.edu")
-//  val Files = myDrive.files.list().foreach(println)
-//  val adminDir = pluggableDirectory(adminImpersonatedEmail)
-//  val Users = adminDir.users.list().foreach(println)
-//  val Groups = adminDir.groups.list().foreach(println)
+
 
 
 //  val localTime = java.time.LocalDateTime.of(2016, 5, 8, 11, 0)

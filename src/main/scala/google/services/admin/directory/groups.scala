@@ -45,7 +45,7 @@ case class groups(directory: Directory) {
   }
 
   def get(identifier: String ): Try[Group] ={
-    Try(service.groups().get(identifier).execute().asScala)
+    Try(service.groups().get(identifier).execute()).map(_.asScala)
   }
 
   /**
@@ -63,8 +63,8 @@ case class groups(directory: Directory) {
     *
     * @param groupKey The Key of the group either the email adress or the unique key
     */
-  def delete(groupKey: String): Unit = {
-    service.groups().delete(groupKey).execute()
+  def delete(groupKey: String): Try[Unit] = {
+    Try(service.groups().delete(groupKey).execute())
   }
 
 }
