@@ -61,7 +61,18 @@ object DeleteOldGroups {
 //      output
 //    }
 
-    def productionRemoveDB(records: Seq[GWBALIAS_R], tableQuery: TableQuery[GWBALIAS], db: JdbcProfile#Backend#Database): Seq[Int] = {
+    def genericRemoveDB[T](records: Seq[GWBALIAS_R],
+                        tableQuery: TableQuery[GWBALIAS],
+                        db: JdbcProfile#Backend#Database)(f: (String, String) => Future[T])(g: T => T): Seq[T] = {
+      val seqFutures = records.map(record => f(record.typePkCk, record.keyPk))
+      val FutureSeq = Future.sequence(seqFutures)
+      val Result = Await.result(FutureSeq, Duration.Inf)
+      Result.map(g)
+    }
+
+    def productionRemoveDB(records: Seq[GWBALIAS_R],
+                           tableQuery: TableQuery[GWBALIAS],
+                           db: JdbcProfile#Backend#Database): Seq[Int] = {
 
       def deleteFromGwbaliasByPrimaryKey(typePkCk: String, keyPk: String): Future[Int] = {
         val q = tableQuery.filter(rec => rec.typePkCk === typePkCk && rec.keyPk === keyPk)
@@ -70,30 +81,19 @@ object DeleteOldGroups {
         affectedRowsCount
       }
 
-      def deleteFromGwbaliasByRecord(record: GWBALIAS_R): Future[Int] = {
-        deleteFromGwbaliasByPrimaryKey(record.typePkCk, record.keyPk)
-      }
-
-      val SingleFuture = Future.sequence(records.map(deleteFromGwbaliasByRecord))
-      val RemoveSucess = Await.result(SingleFuture, Duration.Inf)
-      RemoveSucess
+      genericRemoveDB(records, tableQuery, db)(deleteFromGwbaliasByPrimaryKey)(T => T)
     }
 
     def debugRemoveDB(records: Seq[GWBALIAS_R], tableQuery: TableQuery[GWBALIAS], db: JdbcProfile#Backend#Database): Seq[String] = {
 
-      def deleteFromGwbaliasByPrimaryKey(typePkCk: String, keyPk: String): String = {
+      def deleteStatementsFromGwbaliasByPrimaryKey(typePkCk: String, keyPk: String): Future[String] = {
         val q = tableQuery.filter(rec => rec.typePkCk === typePkCk && rec.keyPk === keyPk)
         val action = q.delete
-        action.statements.head
+        Future(action.statements.head)
       }
 
-      def deleteFromGwbaliasByRecord(record: GWBALIAS_R): String = {
-        deleteFromGwbaliasByPrimaryKey(record.typePkCk, record.keyPk)
-      }
+      genericRemoveDB(records, tableQuery, db)(deleteStatementsFromGwbaliasByPrimaryKey)(rec => {println(rec); rec})
 
-      val output = records.map(deleteFromGwbaliasByRecord)
-      output.foreach(println)
-      output
     }
 
 
