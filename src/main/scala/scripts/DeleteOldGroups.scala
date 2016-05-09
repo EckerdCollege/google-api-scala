@@ -45,21 +45,6 @@ object DeleteOldGroups {
     def debugRemoveGoogle(optionsOfGroups: Seq[Option[Group]]) = {
       genericRemoveGoogle(optionsOfGroups)(group => directory.groups.get( group.id.get ))
     }
-//    def productionRemoveGoogle(optionsOfGroups: Seq[Option[Group]]): Seq[(Try[Group], Option[Group] )] = {
-//      optionsOfGroups.map{
-//        case Some(group) => Try{ directory.groups.delete( group.id.get ); group }
-//        case None => Failure(new Throwable("No Matching Group"))
-//      }.zip(optionsOfGroups)
-//
-//    }
-//    def debugRemoveGoogle(optionsOfGroups: Seq[Option[Group]]): Seq[(Try[Group], Option[Group] )] = {
-//      val output = optionsOfGroups.map{
-//        case Some(group) => Try{directory.groups.get( group.id.get )}
-//        case None => Failure(new Throwable("No Matching Group"))
-//      }.zip(optionsOfGroups)
-//      output.foreach(println)
-//      output
-//    }
 
     def genericRemoveDB[T](records: Seq[GWBALIAS_R],
                         tableQuery: TableQuery[GWBALIAS],
@@ -95,7 +80,6 @@ object DeleteOldGroups {
       genericRemoveDB(records, tableQuery, db)(deleteStatementsFromGwbaliasByPrimaryKey)(rec => {println(rec); rec})
 
     }
-
 
     def generic[O](f: Seq[Option[Group]] => Seq[(Try[Group], Option[Group] )])
                   (g: (Seq[GWBALIAS_R], TableQuery[GWBALIAS], JdbcProfile#Backend#Database) => Iterable[O]) = {
