@@ -2,7 +2,9 @@ package google.services.admin.directory
 
 import google.language.JavaConverters._
 import models.Group
+
 import scala.annotation.tailrec
+import scala.util.Try
 
 /**
   * Created by davenpcm on 5/3/16.
@@ -10,8 +12,6 @@ import scala.annotation.tailrec
 case class groups(directory: Directory) {
 
   private val service = directory.asJava
-
-
 
   def list(domain: String = "eckerd.edu", resultsPerPage: Int = 500): List[Group] = {
     @tailrec
@@ -42,6 +42,10 @@ case class groups(directory: Directory) {
     }
 
     list()
+  }
+
+  def get(identifier: String ): Try[Group] ={
+    Try(service.groups().get(identifier).execute().asScala)
   }
 
   /**
