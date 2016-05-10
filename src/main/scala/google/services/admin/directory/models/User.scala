@@ -1,6 +1,6 @@
 package google.services.admin.directory.models
 
-
+import language.implicitConversions
 /**
   * Created by davenpcm on 5/6/16.
   */
@@ -17,3 +17,11 @@ case class User(name: Name,
                 isMailboxSetup: Boolean = false,
                 suspended: Boolean = false
                )
+
+object User {
+  implicit def toMember(user: User): Member ={
+    Member(
+      Some(user.primaryEmail)
+    )
+  }
+}

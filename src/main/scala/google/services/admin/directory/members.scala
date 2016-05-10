@@ -30,7 +30,6 @@ class members(directory: Directory) {
              pageToken: String = "",
              members: List[Member] = List[Member]()
             ): List[Member] = {
-      import scala.collection.JavaConverters._
 
       val result = service.members()
         .list(groupKey)
