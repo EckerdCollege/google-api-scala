@@ -66,6 +66,21 @@ object JavaConversions {
     )
   }
 
+  implicit def scalaListMemberAsJavaMembersConversion(b: List[sDirectory.models.Member]): jDirectory.model.Members = {
+    import scala.collection.JavaConverters._
+    val ListJava: List[jDirectory.model.Member] = b.map(scalaMemberAsJavaMemberConversion)
+
+    new jDirectory.model.Members()
+      .setMembers(ListJava.asJava)
+  }
+
+  implicit def javaMembersAsScalaListMemberConversion(b: jDirectory.model.Members): List[sDirectory.models.Member] = {
+    import scala.collection.JavaConverters._
+    Option(b.getMembers)
+      .map(_.asScala.toList.map(javaMemberAsScalaMemberConversion))
+      .getOrElse(List[sDirectory.models.Member]())
+  }
+
   implicit def scalaUserAsJavaUserConversion(user: sDirectory.models.User): jDirectory.model.User = {
     val newUser = new com.google.api.services.admin.directory.model.User
     newUser

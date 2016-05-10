@@ -31,7 +31,6 @@ class members(directory: Directory) {
              members: List[Member] = List[Member]()
             ): List[Member] = {
       import scala.collection.JavaConverters._
-      import com.google.api.services.admin.directory.model.Members
 
       val result = service.members()
         .list(groupKey)
@@ -39,16 +38,8 @@ class members(directory: Directory) {
         .setPageToken(pageToken)
         .execute()
 
-      val typedList = List[Members](result)
-        .map(members =>
-          if (Option(members.getMembers).isDefined) {
-            members.getMembers.asScala.toList
-          }
-          else {
-            List[com.google.api.services.admin.directory.model.Member]()
-          }
-        )
-        .foldLeft(List[Member]())((acc, listMembers) => listMembers.map(_.asScala) ::: acc)
+
+      val typedList = result.asScala
 
       val myList = typedList ::: members
 

@@ -45,6 +45,16 @@ object JavaConverters {
     new AsScala(javaMemberAsScalaMemberConversion(b))
   }
 
+  implicit def scalaListMemberAsJavaMembersConverter(b: List[sDirectory.models.Member])
+  : AsJava[jDirectory.model.Members] = {
+    new AsJava(scalaListMemberAsJavaMembersConversion(b))
+  }
+
+  implicit def javaMembersAsScalaListMemberConverter(b: jDirectory.model.Members):
+  AsScala[List[sDirectory.models.Member]] = {
+    new AsScala(javaMembersAsScalaListMemberConversion(b))
+  }
+
   implicit def scalaUserAsJavaUserConverter(b: sDirectory.models.User): AsJava[jDirectory.model.User] = {
     new AsJava(scalaUserAsJavaUserConversion(b))
   }
