@@ -39,18 +39,19 @@ object CommandLine extends App{
 //  DeleteOldGroups.deleteTermCourses("201430", modules.dbConfig, adminDir)
 
 
-  val groups = adminDir.groups.list().take(100)
+//  val groups = adminDir.groups.list()
+//
+//  val groupsWithMembers = groups.map{ Thread.sleep(50); _.getMembers}
 
-  val groupsWithMembers = groups.map{ Thread.sleep(67); _.getMembers}
-
-
+//  scripts.GoogleUpdateGroupMaster.update
+  scripts.GoogleUpdateGroupToIdent.update
 
 //  val pw = new PrintWriter(new File("/home/davenpcm/Downloads/temp/GroupsWithMembers.txt"))
 //  groupsWithMembers.foreach(group => pw.write(group.toString + "\r\n"))
 
-  groupsWithMembers.foreach(println)
-
-  val users = adminDir.users.list().foreach(println)
+//  groupsWithMembers.foreach(println)
+//
+//  val users = adminDir.users.list().foreach(println)
 
 //  val bannerhelp = groups.find(_.name == "bannerhelp")
 //

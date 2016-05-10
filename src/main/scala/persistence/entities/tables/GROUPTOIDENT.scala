@@ -11,6 +11,8 @@ class GROUPTOIDENT(tag: Tag) extends AutoTable[Group2Ident_R](tag, "GROUP_TO_IDE
   def memberRole = column[String]("MEMBER_ROLE")
   def memberType = column[String]("MEMBER_TYPE")
 
+  def pk = index("GROUPTOIDENT_PK", (groupId, identID), unique = true)
+
   def * = (groupId, identID, autoIndicator, memberRole, memberType, processIndicator) <>
     (Group2Ident_R.tupled, Group2Ident_R.unapply )
 }

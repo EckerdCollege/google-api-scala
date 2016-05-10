@@ -11,5 +11,8 @@ case class GroupMaster_R(id: String,
                          email: String,
                          count: Long,
                          desc: Option[String],
-                         processIndicator: Option[String] = None
+                         processIndicator: Option[String] = None,
+                         autoType: Option[String] = None,
+                         autoKey: Option[String] = None,
+                         autoTermCode : Option[String] = None
                         ) extends AutoEntity
