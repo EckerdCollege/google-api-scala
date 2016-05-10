@@ -2,7 +2,7 @@ package google.services.admin.directory
 
 import google.language.JavaConverters._
 import models.Group
-
+import models.Groups
 import scala.annotation.tailrec
 import scala.util.Try
 
@@ -11,7 +11,7 @@ import scala.util.Try
   */
 case class groups(directory: Directory) {
 
-  private val service = directory.asJava
+  private implicit val service = directory.asJava
 
   def list(domain: String = "eckerd.edu", resultsPerPage: Int = 500): List[Group] = {
     @tailrec
@@ -20,25 +20,17 @@ case class groups(directory: Directory) {
               groups: List[Group] = List[Group]()
             ): List[Group] =
     {
-      import com.google.api.services.admin.directory.model.Groups
-      import collection.JavaConverters._
 
       val result = service.groups()
         .list()
         .setDomain(domain)
         .setMaxResults(resultsPerPage)
         .setPageToken(pageToken)
-        .execute()
+        .execute().asScala
 
-      val typedList = List[Groups](result)
-        .map(groups => groups.getGroups.asScala.toList)
-        .foldLeft(List[Group]())((acc, listGroups) => listGroups.map(_.asScala) ::: acc)
+      val myList = result.groups.getOrElse(List[Group]()) ::: groups
 
-      val myList = typedList ::: groups
-
-      val nextPageToken = result.getNextPageToken
-
-      if (nextPageToken != null && result.getGroups != null) list(nextPageToken, myList) else myList
+      if (result.nextPageToken.isDefined && result.groups.isDefined) list(result.nextPageToken.get, myList) else myList
     }
 
     list()

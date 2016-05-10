@@ -23,7 +23,7 @@ object JavaConversions {
   }
 
   implicit def scalaGroupAsJavaGroupConversion(b: sDirectory.models.Group): jDirectory.model.Group = {
-    val newGroup = new com.google.api.services.admin.directory.model.Group()
+    val newGroup = new jDirectory.model.Group()
       .setName(b.name)
       .setEmail(b.email)
 
@@ -42,7 +42,28 @@ object JavaConversions {
       Option(b.getId),
       Option(b.getDescription),
       Option(b.getDirectMembersCount),
+      None,
       Option(b.getAdminCreated)
+    )
+  }
+
+  implicit def scalaGroupsAsJavaGroupsConversion(b: sDirectory.models.Groups): jDirectory.model.Groups = {
+    import collection.JavaConverters._
+    val groups = b.groups.getOrElse(List[sDirectory.models.Group]()).map(scalaGroupAsJavaGroupConversion).asJava
+    val pageToken = b.nextPageToken.orNull
+
+    new jDirectory.model.Groups()
+      .setGroups(groups)
+      .setNextPageToken(pageToken)
+  }
+
+  implicit def javaGroupsAsScalaGroupsConversion(b: jDirectory.model.Groups): sDirectory.models.Groups = {
+    import collection.JavaConverters._
+    val groups = Option(b.getGroups).map(_.asScala.toList.map(javaGroupAsScalaGroupConversion))
+    val pageToken = Option(b.getNextPageToken)
+    sDirectory.models.Groups(
+      groups,
+      pageToken
     )
   }
 
@@ -66,19 +87,22 @@ object JavaConversions {
     )
   }
 
-  implicit def scalaListMemberAsJavaMembersConversion(b: List[sDirectory.models.Member]): jDirectory.model.Members = {
+  implicit def scalaMembersAsJavaMembersConversion(b: sDirectory.models.Members): jDirectory.model.Members = {
     import scala.collection.JavaConverters._
-    val ListJava: List[jDirectory.model.Member] = b.map(scalaMemberAsJavaMemberConversion)
+    val ListJava: List[jDirectory.model.Member] = b.members.get.map(scalaMemberAsJavaMemberConversion)
 
     new jDirectory.model.Members()
       .setMembers(ListJava.asJava)
+      .setNextPageToken(b.nextPageToken.get)
   }
 
-  implicit def javaMembersAsScalaListMemberConversion(b: jDirectory.model.Members): List[sDirectory.models.Member] = {
+  implicit def javaMembersAsScalaMembersConversion(b: jDirectory.model.Members): sDirectory.models.Members = {
     import scala.collection.JavaConverters._
-    Option(b.getMembers)
-      .map(_.asScala.toList.map(javaMemberAsScalaMemberConversion))
-      .getOrElse(List[sDirectory.models.Member]())
+    sDirectory.models.Members(
+      Option(b.getMembers)
+        .map(_.asScala.toList.map(javaMemberAsScalaMemberConversion)),
+      Option(b.getNextPageToken)
+    )
   }
 
   implicit def scalaUserAsJavaUserConversion(user: sDirectory.models.User): jDirectory.model.User = {
@@ -121,16 +145,23 @@ object JavaConversions {
     )
   }
 
-  implicit def scalaListUserAsJavaUsersConversion(b: List[sDirectory.models.User]): jDirectory.model.Users = {
+  implicit def scalaUsersAsJavaUsersConversion(b: sDirectory.models.Users): jDirectory.model.Users = {
     import scala.collection.JavaConverters._
-    val users = b.map(scalaUserAsJavaUserConversion(_)).asJava
+    val users = b.users.map(_.map(scalaUserAsJavaUserConversion).asJava)
+
     new jDirectory.model.Users()
-      .setUsers(users)
+      .setUsers(users.orNull)
+      .setNextPageToken(b.nextPageToken.orNull)
   }
 
-  implicit def javaUsersAsScalaListUserConversion(b: jDirectory.model.Users): List[sDirectory.models.User] = {
+  implicit def javaUsersAsScalaUsersConversion(b: jDirectory.model.Users): sDirectory.models.Users = {
     import scala.collection.JavaConverters._
-    b.getUsers.asScala.toList.map(javaUserAsScalaUserConversion)
+    val users = Option(b.getUsers).map(_.asScala.toList.map(javaUserAsScalaUserConversion))
+    val pageToken = Option(b.getNextPageToken)
+    sDirectory.models.Users(
+      users,
+      pageToken
+    )
   }
 
   implicit def scalaNameAsJavaUserNameConversion(name: sDirectory.models.Name): jDirectory.model.UserName = {

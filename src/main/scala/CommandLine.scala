@@ -1,3 +1,5 @@
+import java.io.{File, PrintWriter}
+
 import com.typesafe.config.ConfigFactory
 import google.services.drive.Drive
 import google.services.admin.directory.Directory
@@ -7,6 +9,7 @@ import google.services.Scopes.CALENDAR
 import google.services.calendar.Calendar
 import google.services.calendar.models.Event
 import scripts.DeleteOldGroups
+import google.services.admin.directory.models._
 import utils.configuration.ConfigurationModuleImpl
 import utils.persistence.PersistenceModuleImpl
 
@@ -29,14 +32,26 @@ object CommandLine extends App{
 
 
 
-  val adminDir = pluggableDirectory(adminImpersonatedEmail)
+  implicit val adminDir = pluggableDirectory(adminImpersonatedEmail)
 //  val myCal = pluggableCalendar("davenpcm@eckerd.edu")
 //  val myDrive = pluggableDrive("davenpcm@eckerd.edu")
 
-  DeleteOldGroups.deleteTermCourses("201430", modules.dbConfig, adminDir)
+//  DeleteOldGroups.deleteTermCourses("201430", modules.dbConfig, adminDir)
 
 
-//  val groups = adminDir.groups.list()
+  val groups = adminDir.groups.list().take(100)
+
+  val groupsWithMembers = groups.map{ Thread.sleep(67); _.getMembers}
+
+
+
+//  val pw = new PrintWriter(new File("/home/davenpcm/Downloads/temp/GroupsWithMembers.txt"))
+//  groupsWithMembers.foreach(group => pw.write(group.toString + "\r\n"))
+
+  groupsWithMembers.foreach(println)
+
+  val users = adminDir.users.list().foreach(println)
+
 //  val bannerhelp = groups.find(_.name == "bannerhelp")
 //
 //  val bannerhelp2 = adminDir.groups.get(bannerhelp.get.id.get)

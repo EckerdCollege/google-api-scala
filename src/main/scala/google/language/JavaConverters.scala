@@ -37,6 +37,14 @@ object JavaConverters {
     new AsScala(javaGroupAsScalaGroupConversion(b))
   }
 
+  implicit def scalaGroupsAsJavaGroupsConverter(b: sDirectory.models.Groups): AsJava[jDirectory.model.Groups] = {
+    new AsJava(scalaGroupsAsJavaGroupsConversion(b))
+  }
+
+  implicit def javaGroupsAsScalaGroupsConverter(b: jDirectory.model.Groups): AsScala[sDirectory.models.Groups] = {
+    new AsScala(javaGroupsAsScalaGroupsConversion(b))
+  }
+
   implicit def scalaMemberAsJavaMemberConverter(b: sDirectory.models.Member): AsJava[jDirectory.model.Member] = {
     new AsJava(scalaMemberAsJavaMemberConversion(b))
   }
@@ -45,14 +53,14 @@ object JavaConverters {
     new AsScala(javaMemberAsScalaMemberConversion(b))
   }
 
-  implicit def scalaListMemberAsJavaMembersConverter(b: List[sDirectory.models.Member])
+  implicit def scalaListMemberAsJavaMembersConverter(b: sDirectory.models.Members)
   : AsJava[jDirectory.model.Members] = {
-    new AsJava(scalaListMemberAsJavaMembersConversion(b))
+    new AsJava(scalaMembersAsJavaMembersConversion(b))
   }
 
   implicit def javaMembersAsScalaListMemberConverter(b: jDirectory.model.Members):
-  AsScala[List[sDirectory.models.Member]] = {
-    new AsScala(javaMembersAsScalaListMemberConversion(b))
+  AsScala[sDirectory.models.Members] = {
+    new AsScala(javaMembersAsScalaMembersConversion(b))
   }
 
   implicit def scalaUserAsJavaUserConverter(b: sDirectory.models.User): AsJava[jDirectory.model.User] = {
@@ -63,12 +71,12 @@ object JavaConverters {
     new AsScala(javaUserAsScalaUserConversion(b))
   }
 
-  implicit def scalaListUserAsJavaUsersConverter(b: List[sDirectory.models.User]): AsJava[jDirectory.model.Users] = {
-    new AsJava(scalaListUserAsJavaUsersConversion(b))
+  implicit def scalaUsersAsJavaUsersConverter(b: sDirectory.models.Users): AsJava[jDirectory.model.Users] = {
+    new AsJava(scalaUsersAsJavaUsersConversion(b))
   }
 
-  implicit def javaUsersAsScalaListUserConverter(b: jDirectory.model.Users): AsScala[List[sDirectory.models.User]] = {
-    new AsScala(javaUsersAsScalaListUserConversion(b))
+  implicit def javaUsersAsScalaListUserConverter(b: jDirectory.model.Users): AsScala[sDirectory.models.Users] = {
+    new AsScala(javaUsersAsScalaUsersConversion(b))
   }
 
   implicit def scalaNameAsJavaUserNameConverter(b: sDirectory.models.Name): AsJava[jDirectory.model.UserName] = {

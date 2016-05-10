@@ -1,5 +1,7 @@
 package google.services.admin.directory.models
 
+import google.services.admin.directory.Directory
+
 
 /**
   * Created by davenpcm on 5/6/16.
@@ -10,6 +12,16 @@ case class Group(
                 id: Option[String] = None,
                 description: Option[String] = None,
                 directMemberCount: Option[Long] = None,
+                members: Option[List[Member]] = None,
                 adminCreated: Option[Boolean] = None
-                )
+                ){
+  def getMembers(implicit directory: Directory): Group = {
+    val groupMembers = directory.members.list(this.id.get)
+    this.copy(members = Option(groupMembers))
+  }
+}
+
+object Group {
+
+}
 

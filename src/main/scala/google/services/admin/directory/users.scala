@@ -27,9 +27,12 @@ class users(directory: Directory) {
     *
     * @return
     */
-  def list(domain: String = "eckerd.edu", orderBy: String = "email", resultsPerPage: Int = 500): List[User] = {
+  def list(domain: String = "eckerd.edu"): List[User] = {
     @tailrec
-    def list(pageToken: String = "", users: List[User] = List[User]()): List[User] = {
+    def list(pageToken: String = "",
+             users: List[User] = List[User](),
+             orderBy: String = "email",
+             resultsPerPage: Int = 500): List[User] = {
 
       val result = service.users()
         .list()
@@ -37,14 +40,12 @@ class users(directory: Directory) {
         .setMaxResults(resultsPerPage)
         .setOrderBy(orderBy)
         .setPageToken(pageToken)
-        .execute()
+        .execute().asScala
 
-      val typedList = result.asScala.reverse
+      val myList = result.users.getOrElse(List[User]()) ::: users
 
-      val myList = typedList ::: users
-
-      val nextPageToken = result.getNextPageToken
-      if (nextPageToken != null && result.getUsers != null) list(nextPageToken, myList) else myList.reverse
+      if (result.nextPageToken.isDefined && result.users.isDefined) list(result.nextPageToken.get, myList)
+      else myList
 
     }
     list()
@@ -87,15 +88,14 @@ class users(directory: Directory) {
         .setMaxResults(resultsPerPage)
         .setOrderBy(orderBy)
         .setPageToken(pageToken)
-        .execute()
+        .execute().asScala
 
-      val typed = result.asScala.map(f).reverse
 
-      lazy val list: List[T] = typed ::: transformed
+      lazy val list: List[T] = result.users.getOrElse(List[User]()).map(f) ::: transformed
 
-      val nextPageToken = result.getNextPageToken
-
-      if (nextPageToken != null && result.getUsers != null) transformAllGoogleUsers(nextPageToken, list) else list.reverse
+      if (result.nextPageToken.isDefined && result.users.isDefined){
+        transformAllGoogleUsers(result.nextPageToken.get, list)
+      } else list
     }
     transformAllGoogleUsers()
   }

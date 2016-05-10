@@ -35,16 +35,11 @@ class members(directory: Directory) {
         .list(groupKey)
         .setMaxResults(500)
         .setPageToken(pageToken)
-        .execute()
+        .execute().asScala
 
+      val myList = result.members.getOrElse(List[Member]()) ::: members
 
-      val typedList = result.asScala
-
-      val myList = typedList ::: members
-
-      val nextPageToken = result.getNextPageToken
-
-      if (nextPageToken != null && result.getMembers != null) list(nextPageToken, myList)
+      if (result.nextPageToken.isDefined && result.members.isDefined) list(result.nextPageToken.get, myList)
       else myList
     }
     list()
