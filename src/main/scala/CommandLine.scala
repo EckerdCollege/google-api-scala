@@ -1,38 +1,34 @@
-import java.io.{File, PrintWriter}
 
 import com.typesafe.config.ConfigFactory
-import google.services.drive.Drive
-import google.services.admin.directory.Directory
-import google.services.Scopes.DRIVE
-import google.services.Scopes.ADMIN_DIRECTORY
-import google.services.Scopes.CALENDAR
-import google.services.calendar.Calendar
-import google.services.calendar.models.Event
-import scripts.DeleteOldGroups
-import google.services.admin.directory.models._
-import utils.configuration.ConfigurationModuleImpl
-import utils.persistence.PersistenceModuleImpl
+import tech.christopherdavenport.google.api.services.drive.Drive
+import tech.christopherdavenport.google.api.services.admin.directory.Directory
+import tech.christopherdavenport.google.api.services.Scopes.DRIVE
+import tech.christopherdavenport.google.api.services.Scopes.ADMIN_DIRECTORY
+import tech.christopherdavenport.google.api.services.Scopes.CALENDAR
+import tech.christopherdavenport.google.api.services.calendar.Calendar
+import tech.christopherdavenport.google.api.services.calendar.models.Event
+import tech.christopherdavenport.google.api.services.admin.directory.models._
+
 
 /**
   * Created by davenpcm on 5/3/16.
   */
 object CommandLine extends App{
-  val modules = new ConfigurationModuleImpl with PersistenceModuleImpl
 
   val scope = CALENDAR :: DRIVE ::: ADMIN_DIRECTORY
   val config = ConfigFactory.load().getConfig("google")
-  val serviceAccountEmail = config.getString("email")
-  val credentialFilePath = config.getString("pkcs12FilePath")
   val applicationName = config.getString("applicationName")
-  val adminImpersonatedEmail = config.getString("impersonatedEmail")
+  val serviceAccountEmail = config.getString("serviceAccountEmail")
+  val credentialFilePath = config.getString("credentialFilePath")
+  val adminImpersonatedEmail = config.getString("administratorEmail")
 
   val pluggableDrive = Drive(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
   val pluggableDirectory = Directory(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
   val pluggableCalendar = Calendar(serviceAccountEmail, credentialFilePath, applicationName, scope)(_)
 
-
-
   implicit val adminDir = pluggableDirectory(adminImpersonatedEmail)
+
+  adminDir.users.list().foreach(println)
 //  val myCal = pluggableCalendar("davenpcm@eckerd.edu")
 //  val myDrive = pluggableDrive("davenpcm@eckerd.edu")
 
@@ -44,7 +40,6 @@ object CommandLine extends App{
 //  val groupsWithMembers = groups.map{ Thread.sleep(50); _.getMembers}
 
 //  scripts.GoogleUpdateGroupMaster.update
-  scripts.GoogleUpdateGroupToIdent.update
 
 //  val pw = new PrintWriter(new File("/home/davenpcm/Downloads/temp/GroupsWithMembers.txt"))
 //  groupsWithMembers.foreach(group => pw.write(group.toString + "\r\n"))
@@ -182,7 +177,7 @@ object CommandLine extends App{
 //  val DriveScope = DriveScopes.DRIVE
 //  val Scopes = ListScopes.foldRight("")((a,b) => a + "," + b).dropRight(1)
 
-//  val service = google.services.service(
+//  val service = tech.christopherdavenport.google.api.services.service(
 //    serviceAccountEmail,
 //    adminImpersonatedEmail,
 //    credentialFilePath,
@@ -208,17 +203,17 @@ object CommandLine extends App{
 
 //  val service = getCalendar(credential, applicationName)
 //
-//  val event = google.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
-//  val finalevent = google.services.calendar.event.put(service, event)
+//  val event = tech.christopherdavenport.google.api.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
+//  val finalevent = tech.christopherdavenport.google.api.services.calendar.event.put(service, event)
 //  val service = getDrive(credential, applicationName)
 
-//  val these = google.services.drive.files.list(service)
+//  val these = tech.christopherdavenport.google.api.services.drive.files.list(service)
 //  val photoshop = these.filter(_.getMimeType == "image/x-photoshop")
 //  photoshop.foreach(println)
 //
-//  val file = google.services.drive.files.generateMetaData("ChrisTestFolderShare", "Test Description", "application/vnd.google-apps.folder")
+//  val file = tech.christopherdavenport.google.api.services.drive.files.generateMetaData("ChrisTestFolderShare", "Test Description", "application/vnd.google-apps.folder")
 //  println(file)
-//  val finishedFile = google.services.drive.files.upload(service, file)
+//  val finishedFile = tech.christopherdavenport.google.api.services.drive.files.upload(service, file)
 //  println(finishedFile)
 ////
 //  val mimeType = "image/png"
@@ -232,28 +227,28 @@ object CommandLine extends App{
 //
 //  println(permission)
 //
-//  val createpermission = google.services.drive.permissions.create(service, finishedFile.getId, permission, false)
+//  val createpermission = tech.christopherdavenport.google.api.services.drive.permissions.create(service, finishedFile.getId, permission, false)
 //  println(createpermission)
 //
-//  val subFolder = google.services.drive.files.generateMetaData("ChrisTestSubFolder", "Random Description", "application/vnd.google-apps.folder", Some(List(finishedFile.getId)))
-//  val finishedSubFolder = google.services.drive.files.upload(service, subFolder)
+//  val subFolder = tech.christopherdavenport.google.api.services.drive.files.generateMetaData("ChrisTestSubFolder", "Random Description", "application/vnd.google-apps.folder", Some(List(finishedFile.getId)))
+//  val finishedSubFolder = tech.christopherdavenport.google.api.services.drive.files.upload(service, subFolder)
 //  println(finishedSubFolder)
 
-//  val imageMetaData = google.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
+//  val imageMetaData = tech.christopherdavenport.google.api.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
 //  println(imageMetaData)
-//  val imageContent = google.services.drive.files.generateFileContents(picturePath, mimeType)
+//  val imageContent = tech.christopherdavenport.google.api.services.drive.files.generateFileContents(picturePath, mimeType)
 //
-//  val finishedImage = google.services.drive.files.upload(service, imageMetaData, imageContent)
+//  val finishedImage = tech.christopherdavenport.google.api.services.drive.files.upload(service, imageMetaData, imageContent)
 //  println(finishedImage)
 
 //    val path = "/home/davenpcm/Downloads/temp/"
 ////    val id = "1kvw_tvL7AkQGSoMj6M7Yh4jDAQBdQwTwc8jirAhXer8"
-//    val listAllApp = google.services.drive.files.listApplicationData(service)
+//    val listAllApp = tech.christopherdavenport.google.api.services.drive.files.listApplicationData(service)
 //    listAllApp.foreach(println)
-//    val file = google.services.drive.files.get(service, id)
+//    val file = tech.christopherdavenport.google.api.services.drive.files.get(service, id)
 //    println(file)
-//    google.services.drive.files.delete(service, id)
-//    val download = google.services.drive.files.download(service, path, file)
+//    tech.christopherdavenport.google.api.services.drive.files.delete(service, id)
+//    val download = tech.christopherdavenport.google.api.services.drive.files.download(service, path, file)
 //    println(download)
 
 //  val directory = adminService.Directory
