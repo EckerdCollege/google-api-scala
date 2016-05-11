@@ -1,7 +1,10 @@
 package tech.christopherdavenport.google.api.services.admin.directory
 
+import com.typesafe.config.ConfigFactory
 import tech.christopherdavenport.google.api.services.Service
+import tech.christopherdavenport.google.api.services.Scopes.ADMIN_DIRECTORY
 import scala.language.implicitConversions
+
 
 
 /**
@@ -35,5 +38,18 @@ object Directory {
               scope: String)(impersonator: String): Directory = {
       apply(serviceAccountEmail, impersonator, credentialFilePath, applicationName, List(scope))
     }
+
+  def apply(): Directory = {
+
+    val config = ConfigFactory.load().getConfig("google")
+    val serviceAccountEmail = config.getString("serviceAccountEmail")
+    val administratorEmail = config.getString("administratorEmail")
+    val applicationName = config.getString("applicationName")
+    val credentialFilePath = config.getString("credentialFilePath")
+    val scope = ADMIN_DIRECTORY
+
+
+    apply(serviceAccountEmail,  administratorEmail, credentialFilePath, applicationName, scope)
+  }
 }
 
