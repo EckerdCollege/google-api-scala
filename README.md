@@ -29,7 +29,8 @@ google = {
 List All Groups In Your Organization
 ```scala
 import tech.christopherdavenport.google.api.services.admin.directory.Directory
-object Test extends App{
+
+object Test extends App {
 
   implicit val AdminDirectory = Directory()
   val groups = AdminDirectory.groups.list()
@@ -38,6 +39,68 @@ object Test extends App{
 }
 ```
 
+Creating A Group
+```scala
+import tech.christopherdavenport.google.api.services.admin.directory.Directory
+import tech.christopherdavenport.google.api.services.admin.directory.models.Group
+
+object Test extends App {
+
+  implicit val AdminDirectory = Directory()
+  val newGroup = AdminDirectory.groups.create(
+    Group("Group Name", "newGroupEmail@christopherdavenport.tech")
+  )
+  println(newGroup)
+
+}
+```
+
+List All Users In Your Organization
+```scala
+import tech.christopherdavenport.google.api.services.admin.directory.Directory
+
+object Test extends App {
+
+  implicit val AdminDirectory = Directory()
+  val users = AdminDirectory.users.list()
+  users.foreach(println)
+
+}
+```
+
+Creating A User
+```scala
+import tech.christopherdavenport.google.api.services.admin.directory.Directory
+import tech.christopherdavenport.google.api.services.admin.directory.models.{Email, Name, User}
+
+object Test extends App {
+
+  implicit val AdminDirectory = Directory()
+  def superSecretPasswordAlgorithm(): Option[String] = Some("PASSWORD")
+  val newUser = AdminDirectory.users.create(
+    User(
+      Name("givenName", "familyName"),
+      Email("newUser@christopherdavenport.tech"),
+      superSecretPasswordAlgorithm()
+    )
+  )
+  println(newUser)
+
+}
+```
+
+What about members of every group in your organization. Caveat - Takes a chunk of time if you have a lot of users.
+```scala
+import tech.christopherdavenport.google.api.services.admin.directory.Directory
+
+object Test extends App {
+
+  implicit val AdminDirectory = Directory()
+  val groupsWithMembers = AdminDirectory.groups.list().map(_.getMembers)
+  groupsWithMembers.foreach(println)
+
+}
+```
 
 
 
