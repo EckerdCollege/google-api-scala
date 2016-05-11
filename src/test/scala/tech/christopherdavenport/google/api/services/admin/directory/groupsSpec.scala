@@ -2,7 +2,6 @@ package tech.christopherdavenport.google.api.services.admin.directory
 
 import org.scalatest.{FlatSpec, Matchers}
 import tech.christopherdavenport.google.api.services.Scopes._
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
 import com.typesafe.config.ConfigFactory
 
 /**
@@ -11,10 +10,10 @@ import com.typesafe.config.ConfigFactory
 class groupsSpec extends FlatSpec with Matchers {
 
   val config = ConfigFactory.load().getConfig("googleTest")
-  val serviceAccountEmail = config.getString("email")
-  val credentialFilePath = config.getString("pkcs12FilePath")
+  val serviceAccountEmail = config.getString("serviceAccountEmail")
+  val credentialFilePath = config.getString("credentialFilePath")
   val applicationName = config.getString("applicationName")
-  val adminImpersonatedEmail = config.getString("impersonatedEmail")
+  val adminImpersonatedEmail = config.getString("administratorEmail")
 
   val ListScopes = ADMIN_DIRECTORY
 

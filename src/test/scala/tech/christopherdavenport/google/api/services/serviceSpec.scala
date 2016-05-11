@@ -22,10 +22,10 @@ class serviceSpec extends FlatSpec with Matchers {
                      ) extends Service
 
   val config = ConfigFactory.load().getConfig("googleTest")
-  val serviceAccountEmail = config.getString("email")
-  val credentialFilePath = config.getString("pkcs12FilePath")
   val applicationName = config.getString("applicationName")
-  val adminImpersonatedEmail = config.getString("impersonatedEmail")
+  val credentialFilePath = config.getString("credentialFilePath")
+  val serviceAccountEmail = config.getString("serviceAccountEmail")
+  val adminImpersonatedEmail = config.getString("administratorEmail")
 
   val ListScopes = ADMIN_DIRECTORY
 

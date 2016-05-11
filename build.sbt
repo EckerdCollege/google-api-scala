@@ -14,5 +14,6 @@ libraryDependencies ++= List(
   "com.google.apis" % "google-api-services-drive" % "v3-rev23-1.22.0"
 )
 
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/"
 fork in run := true
