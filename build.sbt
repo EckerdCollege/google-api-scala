@@ -1,5 +1,5 @@
 name := "google-api-scala"
-organization := "tech.christopherdavenport"
+organization := "edu.eckerd"
 version := "0.01-SNAPSHOT"
 
 mainClass in Compile := Some("CommandLine")
