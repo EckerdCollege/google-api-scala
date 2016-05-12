@@ -71,16 +71,51 @@ class javaConversionsSpec extends FlatSpec with Matchers {
     jGroup.getId === null
   }
 
+  it should "convert an id of Some(string) to string" in {
+    val string = "115242516671582"
+    val group = sDirectory.models.Group("TestGroup", "test@test.com", id = Some(string))
+    val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
+    jGroup.getId === string
+
+  }
+
   it should "convert a description of None to null" in {
     val group = sDirectory.models.Group("TestGroup", "test@test.com")
     val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
     jGroup.getDescription === null
   }
 
+  it should "convert a description of Some(string) to string" in {
+    val string = "Best Group Ever"
+    val group = sDirectory.models.Group("TestGroup", "test@test.com", description = Some(string))
+    val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
+    jGroup.getDescription === string
+  }
+
   it should "convert a directMembersCount of None to null" in {
     val group = sDirectory.models.Group("TestGroup", "test@test.com")
     val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
     jGroup.getDirectMembersCount === null
+  }
+
+  it should "convert a directMebersCount of Some(long) to long" in {
+    val long = 3L
+    val group = sDirectory.models.Group("TestGroup", "test@test.com", directMemberCount = Some(long))
+    val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
+    jGroup.getDirectMembersCount === long
+  }
+
+  it should "convert adminCreated of None to null" in {
+    val group = sDirectory.models.Group("TestGroup", "test@test.com")
+    val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
+    jGroup.getAdminCreated === null
+  }
+
+  it should "convert adminCreated of Some(bool) to bool" in {
+    val bool = true
+    val group = sDirectory.models.Group("TestGroup", "test@test.com", adminCreated = Some(bool))
+    val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)
+    jGroup.getAdminCreated === bool
   }
 
 }

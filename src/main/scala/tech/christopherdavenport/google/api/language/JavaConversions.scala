@@ -12,6 +12,13 @@ import scala.language.{implicitConversions, postfixOps}
   */
 object JavaConversions {
 
+  /**
+    * This is a one way conversion from the scala object to the java Directory. The java directory does not have
+    * credentials or any of the other inherent attributes. So we use the internal to create what is needed to create
+    * the java Directory
+    * @param b A Scala Directory
+    * @return A Java Directory
+    */
   implicit def scalaDirectoryAsJavaDirectoryConversion(b: sDirectory.Directory): jDirectory.Directory = {
     new com.google.api.services.admin.directory.Directory.Builder(
       b.httpTransport,
@@ -22,6 +29,12 @@ object JavaConversions {
       .build()
   }
 
+  /**
+    * This converts the Scala Class to the Java Class. Checks whether options are Defined and only applies what
+    * is necessary to the class.
+    * @param b A Scala Group
+    * @return A Java Group
+    */
   implicit def scalaGroupAsJavaGroupConversion(b: sDirectory.models.Group): jDirectory.model.Group = {
     val newGroup = new jDirectory.model.Group()
       .setName(b.name)
