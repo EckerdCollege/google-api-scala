@@ -9,7 +9,7 @@ Until I have this published you will need to publish locally first then.
 
 In build.sbt
 ```sbt
-libraryDependencies += "tech.christopherdavenport" %% "google-api-scala" % "0.01-SNAPSHOT"
+libraryDependencies += "edu.eckerd" %% "google-api-scala" % "0.01-SNAPSHOT"
 ```
 
 This is what a default configuration looks like that allows you to access each service with the least leg work.
@@ -28,7 +28,7 @@ google = {
 
 List All Groups In Your Organization
 ```scala
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
+import edu.eckerd.google.api.services.directory.Directory
 
 object Test extends App {
 
@@ -41,8 +41,8 @@ object Test extends App {
 
 Creating A Group
 ```scala
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
-import tech.christopherdavenport.google.api.services.admin.directory.models.Group
+import edu.eckerd.google.api.services.directory.Directory
+import edu.eckerd.google.api.services.directory.models.Group
 
 object Test extends App {
 
@@ -57,7 +57,7 @@ object Test extends App {
 
 List All Users In Your Organization
 ```scala
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
+import edu.eckerd.google.api.services.directory.Directory
 
 object Test extends App {
 
@@ -70,8 +70,8 @@ object Test extends App {
 
 Creating A User
 ```scala
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
-import tech.christopherdavenport.google.api.services.admin.directory.models.{Email, Name, User}
+import edu.eckerd.google.api.services.directory.Directory
+import edu.eckerd.google.api.services.directory.models.{Email, Name, User}
 
 object Test extends App {
 
@@ -91,7 +91,7 @@ object Test extends App {
 
 What about members of every group in your organization. Caveat - Takes a chunk of time if you have a lot of users.
 ```scala
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
+import edu.eckerd.google.api.services.directory.Directory
 
 object Test extends App {
 
