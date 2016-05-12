@@ -98,7 +98,7 @@ class javaConversionsSpec extends FlatSpec with Matchers {
     jGroup.getDirectMembersCount === null
   }
 
-  it should "convert a directMebersCount of Some(long) to long" in {
+  it should "convert a directMembersCount of Some(long) to long" in {
     val long = 3L
     val group = sDirectory.models.Group("TestGroup", "test@test.com", directMemberCount = Some(long))
     val jGroup = JavaConversions.scalaGroupAsJavaGroupConversion(group)

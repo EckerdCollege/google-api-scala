@@ -31,7 +31,7 @@ object JavaConversions {
 
   /**
     * This converts the Scala Class to the Java Class. Checks whether options are Defined and only applies what
-    * is necessary to the class.
+    * is necessary to the class. As Members was a field added in this wrapper it is not converted back.
     * @param b A Scala Group
     * @return A Java Group
     */
