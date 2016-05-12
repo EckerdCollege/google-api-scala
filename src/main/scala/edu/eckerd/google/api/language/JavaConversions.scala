@@ -50,15 +50,23 @@ object JavaConversions {
     newGroup
   }
 
+  /**
+    * Converts a Java Group to a Scala Group. As Groups from the API never discuss members this is initialized as None
+    * and all other fields are based on whether the fields are present or not. ID is a some because despite always being
+    * returned from google, it is not known when you create a new group so should therefore have the option to be
+    * uninitialized.
+    * @param b A Java Group
+    * @return A Scala Group
+    */
   implicit def javaGroupAsScalaGroupConversion(b: jDirectory.model.Group): edu.eckerd.google.api.services.directory.models.Group = {
     sDirectory.models.Group(
-      b.getName,
-      b.getEmail,
+      if (b.getName != null) b.getName else throw new Throwable("Null Group Name Error"),
+      if (b.getEmail != null) b.getEmail else throw new Throwable("Null Group Email Error"),
       Option(b.getId),
       Option(b.getDescription),
-      Option(b.getDirectMembersCount),
+      if (b.getDirectMembersCount != null) Some(b.getDirectMembersCount) else None,
       None,
-      Option(b.getAdminCreated)
+      if (b.getAdminCreated != null) Some(b.getAdminCreated) else None
     )
   }
 

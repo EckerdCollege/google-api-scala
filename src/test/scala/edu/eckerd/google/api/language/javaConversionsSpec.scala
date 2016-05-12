@@ -118,4 +118,150 @@ class javaConversionsSpec extends FlatSpec with Matchers {
     jGroup.getAdminCreated === bool
   }
 
+  "javaGroupAsScalaGroupConversion" should "return a Scala Group" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup shouldBe a [sDirectory.models.Group]
+  }
+
+  it should "maintain the name through conversion" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.name === name
+  }
+
+  it should "throw an error if the name is blank" in {
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setEmail(email)
+    intercept[Throwable]{
+      JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    }
+  }
+
+  it should "maintain the email through conversion" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.email === email
+  }
+
+  it should "throw an error if the email is blank" in {
+    val name = "TestGroup"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+    intercept[Throwable]{
+      JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    }
+  }
+
+  it should "return a None if the id is null" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.id === None
+  }
+
+  it should "return Some(id) if the id is set" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val id = "11514754716654q1a"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+      .setId(id)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.id.get === id
+  }
+
+  it should "return a None if the description is null" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.description === None
+  }
+
+  it should "return Some(description) if the description is set" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val description = "Best Group Ever"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+      .setDescription(description)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.description.get === description
+  }
+
+  it should "return a None if the members count is null" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.directMemberCount === None
+  }
+
+  it should "return Some(long) if the members count is set" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val count = 3L
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+      .setDirectMembersCount(count)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.directMemberCount.get === count
+  }
+
+  it should "return a None for Members" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.members === None
+  }
+
+  it should "return a None if the Admin Created is null" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.adminCreated === None
+  }
+
+  it should "return Some(bool) if the Admin Created is set" in {
+    val name = "TestGroup"
+    val email = "test@test.com"
+    val bool = true
+    val javaGroup = new jDirectory.model.Group()
+      .setName(name)
+      .setEmail(email)
+      .setAdminCreated(bool)
+    val sGroup = JavaConversions.javaGroupAsScalaGroupConversion(javaGroup)
+    sGroup.adminCreated.get === bool
+  }
+
 }
