@@ -1,13 +1,14 @@
 
 import com.typesafe.config.ConfigFactory
-import tech.christopherdavenport.google.api.services.drive.Drive
-import tech.christopherdavenport.google.api.services.admin.directory.Directory
-import tech.christopherdavenport.google.api.services.Scopes.DRIVE
-import tech.christopherdavenport.google.api.services.Scopes.ADMIN_DIRECTORY
-import tech.christopherdavenport.google.api.services.Scopes.CALENDAR
-import tech.christopherdavenport.google.api.services.calendar.Calendar
-import tech.christopherdavenport.google.api.services.calendar.models.Event
-import tech.christopherdavenport.google.api.services.admin.directory.models._
+import edu.eckerd.google.api.services.Scopes
+import edu.eckerd.google.api.services.drive.Drive
+import edu.eckerd.google.api.services.directory.Directory
+import Scopes.DRIVE
+import Scopes.ADMIN_DIRECTORY
+import Scopes.CALENDAR
+import edu.eckerd.google.api.services.calendar.Calendar
+import edu.eckerd.google.api.services.calendar.models.Event
+import edu.eckerd.google.api.services.directory.models._
 
 
 /**
@@ -203,17 +204,17 @@ object CommandLine extends App{
 
 //  val service = getCalendar(credential, applicationName)
 //
-//  val event = tech.christopherdavenport.google.api.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
-//  val finalevent = tech.christopherdavenport.google.api.services.calendar.event.put(service, event)
+//  val event = edu.eckerd.google.api.services.calendar.event.create("Best Phone Call Ever", "Awesome Phone Call", "2016-05-04T20:30:00-04:00", "2016-05-04T21:30:00-04:00", "davenpcm@eckerd.edu")
+//  val finalevent = edu.eckerd.google.api.services.calendar.event.put(service, event)
 //  val service = getDrive(credential, applicationName)
 
-//  val these = tech.christopherdavenport.google.api.services.drive.files.list(service)
+//  val these = edu.eckerd.google.api.services.drive.files.list(service)
 //  val photoshop = these.filter(_.getMimeType == "image/x-photoshop")
 //  photoshop.foreach(println)
 //
-//  val file = tech.christopherdavenport.google.api.services.drive.files.generateMetaData("ChrisTestFolderShare", "Test Description", "application/vnd.google-apps.folder")
+//  val file = edu.eckerd.google.api.services.drive.files.generateMetaData("ChrisTestFolderShare", "Test Description", "application/vnd.google-apps.folder")
 //  println(file)
-//  val finishedFile = tech.christopherdavenport.google.api.services.drive.files.upload(service, file)
+//  val finishedFile = edu.eckerd.google.api.services.drive.files.upload(service, file)
 //  println(finishedFile)
 ////
 //  val mimeType = "image/png"
@@ -227,28 +228,28 @@ object CommandLine extends App{
 //
 //  println(permission)
 //
-//  val createpermission = tech.christopherdavenport.google.api.services.drive.permissions.create(service, finishedFile.getId, permission, false)
+//  val createpermission = edu.eckerd.google.api.services.drive.permissions.create(service, finishedFile.getId, permission, false)
 //  println(createpermission)
 //
-//  val subFolder = tech.christopherdavenport.google.api.services.drive.files.generateMetaData("ChrisTestSubFolder", "Random Description", "application/vnd.google-apps.folder", Some(List(finishedFile.getId)))
-//  val finishedSubFolder = tech.christopherdavenport.google.api.services.drive.files.upload(service, subFolder)
+//  val subFolder = edu.eckerd.google.api.services.drive.files.generateMetaData("ChrisTestSubFolder", "Random Description", "application/vnd.google-apps.folder", Some(List(finishedFile.getId)))
+//  val finishedSubFolder = edu.eckerd.google.api.services.drive.files.upload(service, subFolder)
 //  println(finishedSubFolder)
 
-//  val imageMetaData = tech.christopherdavenport.google.api.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
+//  val imageMetaData = edu.eckerd.google.api.services.drive.files.generateMetaData(pictureName, "Cool Photo", mimeType, Some(List(finishedFile.getId)))
 //  println(imageMetaData)
-//  val imageContent = tech.christopherdavenport.google.api.services.drive.files.generateFileContents(picturePath, mimeType)
+//  val imageContent = edu.eckerd.google.api.services.drive.files.generateFileContents(picturePath, mimeType)
 //
-//  val finishedImage = tech.christopherdavenport.google.api.services.drive.files.upload(service, imageMetaData, imageContent)
+//  val finishedImage = edu.eckerd.google.api.services.drive.files.upload(service, imageMetaData, imageContent)
 //  println(finishedImage)
 
 //    val path = "/home/davenpcm/Downloads/temp/"
 ////    val id = "1kvw_tvL7AkQGSoMj6M7Yh4jDAQBdQwTwc8jirAhXer8"
-//    val listAllApp = tech.christopherdavenport.google.api.services.drive.files.listApplicationData(service)
+//    val listAllApp = edu.eckerd.google.api.services.drive.files.listApplicationData(service)
 //    listAllApp.foreach(println)
-//    val file = tech.christopherdavenport.google.api.services.drive.files.get(service, id)
+//    val file = edu.eckerd.google.api.services.drive.files.get(service, id)
 //    println(file)
-//    tech.christopherdavenport.google.api.services.drive.files.delete(service, id)
-//    val download = tech.christopherdavenport.google.api.services.drive.files.download(service, path, file)
+//    edu.eckerd.google.api.services.drive.files.delete(service, id)
+//    val download = edu.eckerd.google.api.services.drive.files.download(service, path, file)
 //    println(download)
 
 //  val directory = adminService.Directory
