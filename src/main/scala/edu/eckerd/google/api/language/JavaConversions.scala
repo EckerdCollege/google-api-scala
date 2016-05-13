@@ -70,6 +70,13 @@ object JavaConversions {
     )
   }
 
+  /**
+    * Converts a Scala Groups Object to a Java Groups Object. The Java Groups Object is returned by a call to the groups
+    * api and is important as it is more of a page of groups, with a list of the groups and a page token to continue to
+    * the next page. This scala object allows for us to use this paging in scala, and transform back if necessary.
+    * @param b A Scala Groups
+    * @return A Java Groups
+    */
   implicit def scalaGroupsAsJavaGroupsConversion(b: edu.eckerd.google.api.services.directory.models.Groups): jDirectory.model.Groups = {
     import collection.JavaConverters._
     val groups = b.groups.getOrElse(List[edu.eckerd.google.api.services.directory.models.Group]()).map(scalaGroupAsJavaGroupConversion).asJava
