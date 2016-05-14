@@ -264,4 +264,73 @@ class javaConversionsSpec extends FlatSpec with Matchers {
     sGroup.adminCreated.get === bool
   }
 
+  "scalaGroupsAsJavaGroupsconversion" should "return a Java Group" in {
+    val listGroups = List[sDirectory.models.Group](
+      sDirectory.models.Group("TestName1", "test01@test.com"),
+      sDirectory.models.Group("TestName2", "test02@test.com")
+    )
+    val pageToken = "pageTokenTest"
+    val sGroups = sDirectory.models.Groups(
+        Some(listGroups),
+        Some(pageToken)
+      )
+
+    val jGroups = JavaConversions.scalaGroupsAsJavaGroupsConversion(sGroups)
+    jGroups shouldBe a [jDirectory.model.Groups]
+  }
+
+  it should "have the same pagetoken after conversion" in {
+    val listGroups = List[sDirectory.models.Group](
+      sDirectory.models.Group("TestName1", "test01@test.com"),
+      sDirectory.models.Group("TestName2", "test02@test.com")
+    )
+    val pageToken = "pageTokenTest"
+    val sGroups = sDirectory.models.Groups(
+      Some(listGroups),
+      Some(pageToken)
+    )
+    val jGroups = JavaConversions.scalaGroupsAsJavaGroupsConversion(sGroups)
+
+    jGroups.getNextPageToken === pageToken
+  }
+
+  it should "return a null page token if the pageToken is None" in {
+    val listGroups = List[sDirectory.models.Group](
+      sDirectory.models.Group("TestName1", "test01@test.com"),
+      sDirectory.models.Group("TestName2", "test02@test.com")
+    )
+    val sGroups = sDirectory.models.Groups(
+      Some(listGroups),
+      None
+    )
+    val jGroups = JavaConversions.scalaGroupsAsJavaGroupsConversion(sGroups)
+    jGroups.getNextPageToken === null
+  }
+
+  it should "have converted a list of Groups to Java Format" in {
+    val listGroups = List[sDirectory.models.Group](
+      sDirectory.models.Group("TestName1", "test01@test.com"),
+      sDirectory.models.Group("TestName2", "test02@test.com")
+    )
+    val pageToken = "pageTokenTest"
+    val sGroups = sDirectory.models.Groups(
+      Some(listGroups),
+      Some(pageToken)
+    )
+    val jGroups = JavaConversions.scalaGroupsAsJavaGroupsConversion(sGroups)
+
+    jGroups.getGroups.get(0) === JavaConversions.scalaGroupAsJavaGroupConversion( listGroups.head)
+    jGroups.getGroups.get(1) === JavaConversions.scalaGroupAsJavaGroupConversion( listGroups.drop(1).head)
+  }
+
+  it should "have a null groups if groups was None" in {
+    val pageToken = "pageTokenTest"
+    val sGroups = sDirectory.models.Groups(
+      None,
+      Some(pageToken)
+    )
+    val jGroups = JavaConversions.scalaGroupsAsJavaGroupsConversion(sGroups)
+    jGroups.getGroups === null
+  }
+
 }
