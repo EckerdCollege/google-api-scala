@@ -5,11 +5,12 @@ This simple api is a wrapper for the google java libraries. Currently mapping Ad
 and Calendar however with intention to expand the scope moving forward.
 
 #### Setup
-Until I have this published you will need to publish locally first then.
+This is currently published as a Sonatype snapshot until we are ready for a production release.
 
 In build.sbt
 ```sbt
-libraryDependencies += "edu.eckerd" %% "google-api-scala" % "0.01-SNAPSHOT"
+resolvers += Resolver.sonatypeRepo("snapshots")
+libraryDependencies += "edu.eckerd" %% "google-api-scala" % "0.0.1-SNAPSHOT"
 ```
 
 This is what a default configuration looks like that allows you to access each service with the least leg work.
