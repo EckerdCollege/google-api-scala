@@ -87,6 +87,12 @@ object JavaConversions {
       .setNextPageToken(pageToken)
   }
 
+  /**
+    * Conversts a Java Groups Object to a Scala Groups Object. Hopefully this is only used to page through the groups
+    * as otherwise it is primarily  just a List of Groups
+    * @param b A Java Groups
+    * @return A Scala Groups
+    */
   implicit def javaGroupsAsScalaGroupsConversion(b: jDirectory.model.Groups): edu.eckerd.google.api.services.directory.models.Groups = {
     import collection.JavaConverters._
     val groups = Option(b.getGroups).map(_.asScala.toList.map(javaGroupAsScalaGroupConversion))

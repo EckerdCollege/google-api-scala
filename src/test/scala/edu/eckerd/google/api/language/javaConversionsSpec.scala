@@ -264,7 +264,7 @@ class javaConversionsSpec extends FlatSpec with Matchers {
     sGroup.adminCreated.get === bool
   }
 
-  "scalaGroupsAsJavaGroupsconversion" should "return a Java Group" in {
+  "scalaGroupsAsJavaGroupsconversion" should "return a Java Groups" in {
     val listGroups = List[sDirectory.models.Group](
       sDirectory.models.Group("TestName1", "test01@test.com"),
       sDirectory.models.Group("TestName2", "test02@test.com")
@@ -332,5 +332,50 @@ class javaConversionsSpec extends FlatSpec with Matchers {
     val jGroups = JavaConversions.scalaGroupsAsJavaGroupsConversion(sGroups)
     jGroups.getGroups === null
   }
+
+  object javaGroupsAsScalaGroupsSetup {
+    import collection.JavaConverters._
+
+    val PageToken = "Next"
+    val Group1Name = "Test1"
+    val Group1Email = s"$Group1Name@test.com"
+    val Group2Name = "Test2"
+    val Group2Email = s"$Group2Name@test.com"
+    val Group1 = new jDirectory.model.Group()
+      .setName(Group1Name)
+      .setEmail(Group1Email)
+    val Group2 = new jDirectory.model.Group()
+      .setName(Group2Name)
+      .setEmail(Group2Email)
+
+    val Groups = List(Group1, Group2).asJava
+
+    val javaGroups = new jDirectory.model.Groups()
+      .setGroups(Groups)
+      .setNextPageToken(PageToken)
+  }
+
+  "javaGroupsAsScalaGroupsConversion" should "return a Scala Groups" in {
+    import javaGroupsAsScalaGroupsSetup.javaGroups
+    val scalaGroups = JavaConversions.javaGroupsAsScalaGroupsConversion(javaGroups)
+    scalaGroups shouldBe a [sDirectory.models.Groups]
+  }
+
+  it should "have the same page token after conversion" in {
+    import javaGroupsAsScalaGroupsSetup.javaGroups
+    val scalaGroups = JavaConversions.javaGroupsAsScalaGroupsConversion(javaGroups)
+
+    import javaGroupsAsScalaGroupsSetup.PageToken
+
+    scalaGroups.nextPageToken.get === PageToken
+  }
+
+  it should "have A List of Groups" in {
+    import javaGroupsAsScalaGroupsSetup.javaGroups
+    val scalaGroups = JavaConversions.javaGroupsAsScalaGroupsConversion(javaGroups)
+    scalaGroups.groups.get shouldBe a [List[sDirectory.models.Group]]
+  }
+
+
 
 }
