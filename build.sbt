@@ -2,8 +2,6 @@ name := "google-api-scala"
 organization := "edu.eckerd"
 version := "0.0.1-SNAPSHOT"
 
-mainClass in Compile := Some("CommandLine")
-
 scalaVersion := "2.11.8"
 
 libraryDependencies ++= List(
