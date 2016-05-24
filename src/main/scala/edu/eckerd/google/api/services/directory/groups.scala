@@ -1,5 +1,6 @@
 package edu.eckerd.google.api.services.directory
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException
 import edu.eckerd.google.api.language.JavaConverters._
 import models.Group
 
@@ -35,28 +36,38 @@ case class groups(directory: Directory) {
     Try(service.groups().get(identifier).execute()).map(_.asScala)
   }
 
-  def get(group: Group, domain: String = "eckerd.edu", resultsPerPage: Int = 500): Option[Group] = {
-
-    @tailrec
-    def list(pageToken: String = ""): Option[Group] = {
-      val result = service.groups()
-        .list()
-        .setDomain(domain)
-        .setMaxResults(resultsPerPage)
-        .setPageToken(pageToken)
-        .execute().asScala
-
-      val myList = result.groups.getOrElse(List[Group]())
-
-      val matching = for (listedGroup <- myList if listedGroup.name == group.name || listedGroup.email == group.email )
-        yield listedGroup
-
-      val matched = matching.headOption
-
-      if (result.nextPageToken.isDefined && result.groups.isDefined && matched.isEmpty) list(result.nextPageToken.get) else matched
+  def get(group: Group): Try[Group] = {
+    Try{
+      service.groups().get(group.email).execute()
+    }.map(_.asScala) recoverWith {
+      case e: GoogleJsonResponseException if e.getMessage contains "Request rate higher than configured." =>
+        Thread.sleep(100)
+        get(group)
     }
-    list()
   }
+
+//  def get(group: Group, domain: String = "eckerd.edu", resultsPerPage: Int = 500): Option[Group] = {
+//
+//    @tailrec
+//    def list(pageToken: String = ""): Option[Group] = {
+//      val result = service.groups()
+//        .list()
+//        .setDomain(domain)
+//        .setMaxResults(resultsPerPage)
+//        .setPageToken(pageToken)
+//        .execute().asScala
+//
+//      val myList = result.groups.getOrElse(List[Group]())
+//
+//      val matching = for (listedGroup <- myList if listedGroup.name == group.name || listedGroup.email == group.email )
+//        yield listedGroup
+//
+//      val matched = matching.headOption
+//
+//      if (result.nextPageToken.isDefined && result.groups.isDefined && matched.isEmpty) list(result.nextPageToken.get) else matched
+//    }
+//    list()
+//  }
 
   /**
     * This creates a google group
