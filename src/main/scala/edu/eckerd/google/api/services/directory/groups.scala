@@ -33,7 +33,11 @@ case class groups(directory: Directory) {
   }
 
   def get(identifier: String ): Try[Group] ={
-    Try(service.groups().get(identifier).execute()).map(_.asScala)
+    Try(service.groups().get(identifier).execute()).map(_.asScala) recoverWith {
+      case e: GoogleJsonResponseException if e.getMessage contains "Request rate higher than configured." =>
+        Thread.sleep(100)
+        get(identifier)
+    }
   }
 
   def get(group: Group): Try[Group] = {
