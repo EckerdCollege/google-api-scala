@@ -1,6 +1,6 @@
 name := "google-api-scala"
 organization := "edu.eckerd"
-version := "0.0.1-SNAPSHOT"
+version := "0.1.0"
 
 scalaVersion := "2.11.8"
 
@@ -17,8 +17,6 @@ libraryDependencies ++= List(
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 resolvers += "Typesafe Releases" at "http://repo.typesafe.com/typesafe/maven-releases/"
 fork in run := true
-
-credentials += Credentials(Path.userHome / ".sbt" / "0.13" / "sonatype.sbt")
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"
@@ -53,3 +51,8 @@ pomExtra := (
       </developer>
     </developers>
   )
+
+credentials in ThisBuild ++= (for {
+  username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+  password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
