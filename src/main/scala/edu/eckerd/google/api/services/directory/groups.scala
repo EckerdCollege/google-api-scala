@@ -10,7 +10,7 @@ import scala.util.Try
 /**
   * Created by davenpcm on 5/3/16.
   */
-case class groups(directory: Directory) {
+class groups(directory: Directory) {
 
   private implicit val service = directory.asJava
 

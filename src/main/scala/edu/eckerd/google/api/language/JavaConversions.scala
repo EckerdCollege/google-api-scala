@@ -247,8 +247,8 @@ object JavaConversions {
       .setName(file.name)
       .setMimeType(file.mimeType)
     if (file.id isDefined) { metadata.setId(file.id.get)}
-    if (file.extension isDefined){ metadata.setFileExtension(file.extension.get)}
-    if (file.description isDefined){ metadata.setDescription(file.description.get)}
+//    if (file.extension isDefined){ metadata.setFileExtension(file.extension.get)}
+//    if (file.description isDefined){ metadata.setDescription(file.description.get)}
     if (file.parentIds isDefined){ metadata.setParents(file.parentIds.get.asJava)}
     metadata
   }
