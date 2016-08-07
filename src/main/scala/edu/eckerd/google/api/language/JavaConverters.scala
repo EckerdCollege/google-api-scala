@@ -99,21 +99,21 @@ object JavaConverters {
     new AsJava(scalaDriveAsJavaDriveConversion(b))
   }
 
-  implicit def scalaFileAsJavaFileConverter(b: edu.eckerd.google.api.services.drive.models.File): AsJava[jDrive.model.File] = {
-    new AsJava(scalaFileAsJavaFileConversion(b))
-  }
-
-  implicit def javaFileAsScalaFileConverter(b: jDrive.model.File): AsScala[edu.eckerd.google.api.services.drive.models.File] = {
-    new AsScala(javaFileAsScalaFileConversion(b))
-  }
-
-  implicit def scalaListFileAsJavaFileListConverter(b: List[edu.eckerd.google.api.services.drive.models.File]): AsJava[jDrive.model.FileList] = {
-    new AsJava(scalaListFileAsJavaFileListConversion(b))
-  }
-
-  implicit def javaFileListAsScalaListFileConverter(b: jDrive.model.FileList): AsScala[List[edu.eckerd.google.api.services.drive.models.File]] = {
-    new AsScala(javaFileListAsScalaListFileConversion(b))
-  }
+//  implicit def scalaFileAsJavaFileConverter(b: edu.eckerd.google.api.services.drive.models.File): AsJava[jDrive.model.File] = {
+//    new AsJava(scalaFileAsJavaFileConversion(b))
+//  }
+//
+//  implicit def javaFileAsScalaFileConverter(b: jDrive.model.File): AsScala[edu.eckerd.google.api.services.drive.models.File] = {
+//    new AsScala(javaFileAsScalaFileConversion(b))
+//  }
+//
+//  implicit def scalaListFileAsJavaFileListConverter(b: List[edu.eckerd.google.api.services.drive.models.File]): AsJava[jDrive.model.FileList] = {
+//    new AsJava(scalaListFileAsJavaFileListConversion(b))
+//  }
+//
+//  implicit def javaFileListAsScalaListFileConverter(b: jDrive.model.FileList): AsScala[List[edu.eckerd.google.api.services.drive.models.File]] = {
+//    new AsScala(javaFileListAsScalaListFileConversion(b))
+//  }
 
   implicit def scalaFileContentAsJavaFileContentConverter(b: edu.eckerd.google.api.services.drive.models.FileContent)
   : AsJava[com.google.api.client.http.FileContent] = {

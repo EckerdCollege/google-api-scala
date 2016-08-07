@@ -40,7 +40,7 @@ class permissions(drive: Drive) {
             sendNotificationEmail: Boolean,
             emailMessage: String = "",
             transferOwnership: Boolean = false): Permission = {
-    val initService = service.permissions().create(file.id.get, permission.asJava)
+    val initService = service.permissions().create(file.id, permission.asJava)
       .setTransferOwnership(transferOwnership)
       .setSendNotificationEmail(sendNotificationEmail)
 

@@ -241,41 +241,45 @@ object JavaConversions {
     new com.google.api.client.http.FileContent(fileContent.mimeType, fileContent.content)
   }
 
-  implicit def scalaFileAsJavaFileConversion(file: edu.eckerd.google.api.services.drive.models.File): jDrive.model.File = {
-    import scala.collection.JavaConverters._
-    val metadata = new com.google.api.services.drive.model.File()
-      .setName(file.name)
-      .setMimeType(file.mimeType)
-    if (file.id isDefined) { metadata.setId(file.id.get)}
-//    if (file.extension isDefined){ metadata.setFileExtension(file.extension.get)}
-//    if (file.description isDefined){ metadata.setDescription(file.description.get)}
-    if (file.parentIds isDefined){ metadata.setParents(file.parentIds.get.asJava)}
-    metadata
-  }
+//  implicit def scalaFileAsJavaFileConversion(file: edu.eckerd.google.api.services.drive.models.File): jDrive.model.File = {
+//    import scala.collection.JavaConverters._
+//    val metadata = new com.google.api.services.drive.model.File()
+//      .setName(file.name)
+//      .setMimeType(file.mimeType)
+//      .setId(file.id)
+////    if (file.extension isDefined){ metadata.setFileExtension(file.extension.get)}
+////    if (file.description isDefined){ metadata.setDescription(file.description.get)}
+//    if (file.parentIds isDefined){ metadata.setParents(file.parentIds.get.asJava)}
+//    file.trashed.map(trashed => metadata.setExplicitlyTrashed(trashed))
+//    metadata
+//  }
 
-  implicit def javaFileAsScalaFileConversion(file: jDrive.model.File): edu.eckerd.google.api.services.drive.models.File = {
-    import scala.collection.JavaConverters._
-    sDrive.models.File(
-      file.getName,
-      file.getMimeType,
-      Option(file.getId),
-      Option(file.getFileExtension),
-      Option(file.getDescription),
-      Option(file.getParents).map(_.asScala.toList)
-    )
-  }
+//  implicit def javaFileAsScalaFileConversion(file: jDrive.model.File): edu.eckerd.google.api.services.drive.models.File = {
+//    sDrive.models.File(
+//      file.getName,
+//      file.getMimeType,
+//      file.getId,
+//      Option(file.getCreatedTime),
+//      Option(file.getModifiedTime),
+//      if (file.getTrashed != null) Some(file.getTrashed) else None,
+//      Option(file.getParents).map{ parents =>
+//        import scala.collection.JavaConverters._
+//        parents.asScala.toList
+//      }
+//    )
+//  }
 
-  implicit def scalaListFileAsJavaFileListConversion(b: List[edu.eckerd.google.api.services.drive.models.File]): jDrive.model.FileList = {
-    import collection.JavaConverters._
-    val files = b.map(scalaFileAsJavaFileConversion).asJava
-    new jDrive.model.FileList()
-      .setFiles(files)
-  }
-
-  implicit def javaFileListAsScalaListFileConversion(b: jDrive.model.FileList): List[edu.eckerd.google.api.services.drive.models.File] = {
-    import collection.JavaConverters._
-    b.getFiles.asScala.toList.map(javaFileAsScalaFileConversion)
-  }
+//  implicit def scalaListFileAsJavaFileListConversion(b: List[edu.eckerd.google.api.services.drive.models.File]): jDrive.model.FileList = {
+//    import collection.JavaConverters._
+//    val files = b.map(scalaFileAsJavaFileConversion).asJava
+//    new jDrive.model.FileList()
+//      .setFiles(files)
+//  }
+//
+//  implicit def javaFileListAsScalaListFileConversion(b: jDrive.model.FileList): List[edu.eckerd.google.api.services.drive.models.File] = {
+//    import collection.JavaConverters._
+//    b.getFiles.asScala.toList.map(javaFileAsScalaFileConversion)
+//  }
 
   implicit def scalaPermissionAsJavaPermissionConversion(permission: edu.eckerd.google.api.services.drive.models.Permission)
   : jDrive.model.Permission = {
