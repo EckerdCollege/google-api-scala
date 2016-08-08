@@ -1,7 +1,6 @@
 package edu.eckerd.google.api.services.drive
 
 import edu.eckerd.google.api.services.Service
-
 import language.implicitConversions
 
 /**
