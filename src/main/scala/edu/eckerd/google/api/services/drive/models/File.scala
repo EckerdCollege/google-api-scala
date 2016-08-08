@@ -2,8 +2,10 @@ package edu.eckerd.google.api.services.drive.models
 
 import com.google.api.client.util.DateTime
 import com.google.api.services.drive.model.{File => jFile}
-import java.time.{LocalDateTime, ZoneOffset, ZonedDateTime}
-import java.time.format.{DateTimeFormatter, DateTimeFormatterBuilder}
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
+
 import scala.language.implicitConversions
 
 
@@ -25,7 +27,7 @@ object File {
           .setId(id)
           .setName(name)
           .setMimeType(mimeType)
-      case CompleteFile(id, name, mimeType, createdTime, modifiedTime, parentIds, trashed) =>
+      case CompleteFile(id, name, mimeType, size, createdTime, modifiedTime, parentIds, trashed)=>
         new jFile()
           .setId(id)
           .setName(name)
@@ -34,6 +36,8 @@ object File {
           .setModifiedTime(modifiedTime)
           .setParents{ import scala.collection.JavaConverters._ ; parentIds.asJava}
           .setTrashed(trashed)
+          .setSize(size)
+
     }
   }
 
@@ -44,8 +48,10 @@ object File {
       val mimeTypeOpt = Option(file.getMimeType)
       val createdTimeOpt = Option(file.getCreatedTime)
       val modifiedTimeOpt = Option(file.getModifiedTime)
-      val parentIdsOpt = Option(file.getParents).map{import scala.collection.JavaConverters._; _.asScala.toList}
       val trashedOpt = Option(file.getTrashed)
+
+      val parentIdsOpt = Option(file.getParents).map{import scala.collection.JavaConverters._; _.asScala.toList}
+      val sizeOpt: Option[Long] = Option(file.getSize).map(_.toLong)
 
       (
         idOpt,
@@ -53,7 +59,6 @@ object File {
         mimeTypeOpt,
         createdTimeOpt,
         modifiedTimeOpt,
-        parentIdsOpt,
         trashedOpt
       ) match {
         case (
@@ -62,20 +67,27 @@ object File {
           Some(mimeType),
           Some(createdTime),
           Some(modifiedTime),
-          parentIds,
           Some(trashed)
           ) =>
-
-          CompleteFile(id, name, mimeType, createdTime, modifiedTime, parentIds.getOrElse(List[String]()), trashed)
+          CompleteFile(
+            id,
+            name,
+            mimeType,
+            sizeOpt.getOrElse(0L),
+            createdTime,
+            modifiedTime,
+            parentIdsOpt.getOrElse(List[String]()),
+            trashed
+          )
 
         case (
           Some(id),
           Some(name),
           Some(mimeType),
-          _, _, _, _
+          _, _, _
           ) =>
           FileMetaData(id, name, mimeType)
-        case _ => throw new Error("Because I felt Like It")
+        case _ => throw new Error("File Should Always Return ID, Name, and MimeType")
       }
     }
 
@@ -103,6 +115,7 @@ case class CompleteFile(
                        id: String,
                        name: String,
                        mimeType: String,
+                       size: Long,
                        createdTime: LocalDateTime,
                        modifiedTime: LocalDateTime,
                        parentIds: List[String],

@@ -17,22 +17,13 @@ class files(drive: Drive) {
 
   private val service = drive.asJava
 
-  def list() : List[File] = {
+  def list : List[File] = {
     @tailrec
-    def list(pageToken: String = "", files: List[File] = List[File]()): List[File] = {
-
-      def result: FileList  = service.files().list()
-        .setPageSize(500)
-        .setPageToken(pageToken)
-        .execute()
-        .asScala
-
-      result match {
+    def list( pageToken: String = "", files: List[File] = List[File]()): List[File] = listPage(pageToken) match {
         case FileListPage(thisPageList, nextPageToken) =>
           list(nextPageToken, thisPageList ::: files)
         case CompleteFileList(thisPageList) =>
           thisPageList ::: files
-      }
     }
     list()
   }
@@ -69,14 +60,14 @@ class files(drive: Drive) {
     service.files().delete(fileId).execute()
   }
 
-//  def create(file: File): File = file.content match {
+  def create(file: File, fileContent: FileContent): File = {
 //    case None => service.files().create(file.asJava).execute().asScala
-//    case Some(fileContent) => service.files().create(file.asJava, fileContent.asJava).execute().asScala
-//  }
+    service.files().create(file.asJava, fileContent.asJava).execute().asScala
+  }
 
   def get(fileId: String): File =  {
     service.files().get(fileId)
-        .setFields("id, name, mimeType, description, createdTime, modifiedTime, parents, trashed")
+        .setFields("id, name, mimeType, size, description, createdTime, modifiedTime, parents, trashed")
       .execute()
       .asScala
   }
@@ -88,18 +79,6 @@ class files(drive: Drive) {
   def update(file: File): File = {
     service.files().update(file.id, file.asJava).execute().asScala
   }
-
-//  def getParents(file: File): File = {
-//    val returnedFile: File = service.files().get(file.id).setFields("parents").execute().asScala
-//    val parents = returnedFile.parentIds
-//    file.copy(parentIds = parents)
-//
-//  }
-//
-//  def getTrashed(file: File): File = {
-//    val returnedFile: File = service.files().get(file.id).setFields("trashed").execute().asScala
-//    returnedFile
-//  }
 
   def download(outputPath: String, file: File): Unit = {
     val id = file.id
