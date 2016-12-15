@@ -2,16 +2,16 @@ name := "google-api-scala"
 organization := "edu.eckerd"
 version := "0.1.1-SNAPSHOT"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.1"
 
 libraryDependencies ++= List(
-  "com.typesafe" % "config" % "1.3.0",
-  "org.scalatest" %% "scalatest" % "3.0.0" % "test",
-  "org.typelevel" %% "cats" % "0.6.1",
+  "com.typesafe" % "config" % "1.3.1",
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test",
+  "org.typelevel" %% "cats" % "0.8.1",
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.apis" % "google-api-services-admin-directory" % "directory_v1-rev67-1.22.0",
   "com.google.apis" % "google-api-services-calendar" % "v3-rev180-1.22.0",
-  "com.google.apis" % "google-api-services-gmail" % "v1-rev41-1.22.0",
+//  "com.google.apis" % "google-api-services-gmail" % "v1-rev41-1.22.0",
   "com.google.apis" % "google-api-services-drive" % "v3-rev23-1.22.0"
 )
 

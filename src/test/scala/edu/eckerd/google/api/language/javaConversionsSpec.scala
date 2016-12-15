@@ -373,7 +373,7 @@ class javaConversionsSpec extends FlatSpec with Matchers {
   it should "have A List of Groups" in {
     import javaGroupsAsScalaGroupsSetup.javaGroups
     val scalaGroups = JavaConversions.javaGroupsAsScalaGroupsConversion(javaGroups)
-    scalaGroups.groups.get shouldBe a [List[sDirectory.models.Group]]
+    scalaGroups.groups.get shouldBe a [List[_]]
   }
 
 
