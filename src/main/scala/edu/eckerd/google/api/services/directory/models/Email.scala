@@ -2,9 +2,6 @@ package edu.eckerd.google.api.services.directory.models
 
 import scala.language.implicitConversions
 
-/**
-  * Created by davenpcm on 5/6/16.
-  */
 case class Email(address: String, primary: Boolean)
 
 object Email {

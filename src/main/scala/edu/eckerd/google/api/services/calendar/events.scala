@@ -6,10 +6,6 @@ import edu.eckerd.google.api.language.JavaConverters._
 import scala.collection.JavaConverters._
 import java.time.ZonedDateTime
 
-
-/**
-  * Created by davenpcm on 5/3/16.
-  */
 class events(calendar: Calendar) {
   val service = calendar.asJava
 

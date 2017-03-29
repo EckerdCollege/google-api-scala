@@ -3,9 +3,7 @@ package edu.eckerd.google.api.services
 import com.google.api.client.googleapis.auth.oauth2.{GoogleClientSecrets, GoogleCredential}
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.google.api.client.json.jackson2.JacksonFactory
-/**
-  * Created by davenpcm on 5/3/16.
-  */
+
 trait Service {
 
   val serviceAccountEmail: String

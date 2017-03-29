@@ -1,9 +1,7 @@
 package edu.eckerd.google.api.services.directory.models
 
 import language.implicitConversions
-/**
-  * Created by davenpcm on 5/6/16.
-  */
+
 case class User(name: Name,
                 primaryEmail: Email,
                 password: Option[String] = None,

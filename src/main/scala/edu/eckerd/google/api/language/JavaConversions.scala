@@ -7,9 +7,6 @@ import edu.eckerd.google.api.services.{calendar => sCalendar, drive => sDrive}
 
 import scala.language.{implicitConversions, postfixOps}
 
-/**
-  * Created by davenpcm on 5/7/16.
-  */
 object JavaConversions {
 
   /**

@@ -6,9 +6,6 @@ import JavaConverters._
 
 import scala.util.Try
 
-/**
-  * Created by davenpcm on 5/3/16.
-  */
 class photos(directory: Directory) {
   private val service = directory.asJava
 

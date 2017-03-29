@@ -8,9 +8,6 @@ import JavaConverters._
 import language.{implicitConversions, postfixOps}
 import scala.annotation.tailrec
 
-/**
-  * Created by davenpcm on 5/3/16.
-  */
 class members(directory: Directory) {
 
   private val service = directory.asJava

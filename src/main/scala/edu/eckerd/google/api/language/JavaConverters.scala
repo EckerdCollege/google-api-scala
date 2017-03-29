@@ -8,9 +8,6 @@ import edu.eckerd.google.api.language.JavaConversions._
 
 import scala.language.{implicitConversions, postfixOps}
 
-/**
-  * Created by davenpcm on 5/7/16.
-  */
 object JavaConverters {
 
   class AsJava[C](op: => C){

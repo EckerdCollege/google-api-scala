@@ -1,6 +1,5 @@
 package edu.eckerd.google.api.services.directory
 
-
 import edu.eckerd.google.api.language.JavaConverters._
 import edu.eckerd.google.api.services.directory.models.{Email, Name, User}
 
@@ -8,9 +7,6 @@ import scala.language.{implicitConversions, postfixOps}
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
 
-/**
-  * Created by davenpcm on 5/3/16.
-  */
 class users(directory: Directory) {
 
   private val service = directory.asJava

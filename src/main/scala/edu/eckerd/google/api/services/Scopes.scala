@@ -3,11 +3,7 @@ package edu.eckerd.google.api.services
 import com.google.api.services.admin.directory.DirectoryScopes
 import com.google.api.services.calendar.CalendarScopes
 import com.google.api.services.drive.DriveScopes
-//import com.google.api.services.gmail.GmailScopes
 
-/**
-  * Created by davenpcm on 5/6/16.
-  */
 object Scopes {
   val ADMIN_DIRECTORY_USER = DirectoryScopes.ADMIN_DIRECTORY_USER
   val ADMIN_DIRECTORY_USER_READONLY = DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY
@@ -17,9 +13,6 @@ object Scopes {
   val ADMIN_DIRECTORY_GROUP_MEMBER_READONLY = DirectoryScopes.ADMIN_DIRECTORY_GROUP_MEMBER_READONLY
   val DRIVE_CONTROL = DriveScopes.DRIVE
   val DRIVE_CONTROL_APPDATA = DriveScopes.DRIVE_APPDATA
-//  val GMAIL_COMPOSE = GmailScopes.GMAIL_COMPOSE
-//  val GMAIL_SEND = GmailScopes.GMAIL_SEND
-//  val GMAIL_READONLY = GmailScopes.GMAIL_READONLY
   val CALENDAR = CalendarScopes.CALENDAR
   val CALENDAR_READONLY = CalendarScopes.CALENDAR_READONLY
 
@@ -33,8 +26,6 @@ object Scopes {
     ADMIN_DIRECTORY_GROUP_MEMBER,
     DRIVE_CONTROL,
     DRIVE_CONTROL_APPDATA
-//    GMAIL_COMPOSE,
-//    GMAIL_SEND
   )
 
 
