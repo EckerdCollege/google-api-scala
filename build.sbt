@@ -3,6 +3,7 @@ organization := "edu.eckerd"
 version := "0.1.1-SNAPSHOT"
 
 scalaVersion := "2.12.1"
+crossScalaVersions := Seq("2.11.8", "2.12.1")
 
 libraryDependencies ++= List(
   "com.typesafe" % "config" % "1.3.1",
