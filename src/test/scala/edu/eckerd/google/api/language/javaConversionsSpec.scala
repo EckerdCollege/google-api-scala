@@ -1,49 +1,13 @@
 package edu.eckerd.google.api.language
 
 import com.google.api.services.admin.{directory => jDirectory}
-import com.google.api.services.{calendar => jCalendar, drive => jDrive}
-import com.typesafe.config.ConfigFactory
 import org.scalatest.{FlatSpec, Matchers}
 import edu.eckerd.google.api.services.{directory => sDirectory}
-import edu.eckerd.google.api.services.{calendar => sCalendar, drive => sDrive}
 import edu.eckerd.google.api.services.Scopes._
 
-
-
-/**
-  * Created by davenpcm on 5/11/16.
-  */
 class javaConversionsSpec extends FlatSpec with Matchers {
 
-//  val config = ConfigFactory.load().getConfig("googleTest")
-//  val applicationName = config.getString("applicationName")
-//  val credentialFilePath = config.getString("credentialFilePath")
-//  val serviceAccountEmail = config.getString("serviceAccountEmail")
-//  val adminImpersonatedEmail = config.getString("administratorEmail")
-
   val ListScopes = CALENDAR :: ADMIN_DIRECTORY ::: DRIVE
-
-//  "scalaDirectoryAsJavaDirectoryConversion" should "convert a scala Directory to a Java Directory" in {
-//    val adminDir = sDirectory.Directory(serviceAccountEmail,
-//      adminImpersonatedEmail,
-//      credentialFilePath,
-//      applicationName,
-//      ListScopes
-//    )
-//    val jDir = JavaConversions.scalaDirectoryAsJavaDirectoryConversion(adminDir)
-//    jDir shouldBe a [jDirectory.Directory]
-//  }
-//
-//  it should "maintain the application name through conversion" in {
-//    val adminDir = sDirectory.Directory(serviceAccountEmail,
-//      adminImpersonatedEmail,
-//      credentialFilePath,
-//      applicationName,
-//      ListScopes
-//    )
-//    val jDir = JavaConversions.scalaDirectoryAsJavaDirectoryConversion(adminDir)
-//    jDir.getApplicationName === applicationName
-//  }
 
   "scalaGroupAsJavaGroupConversion" should "convert a scala group to java group" in {
     val group = sDirectory.models.Group("TestGroup", "test@test.com")

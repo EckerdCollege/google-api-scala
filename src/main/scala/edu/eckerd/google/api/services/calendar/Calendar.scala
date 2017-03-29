@@ -4,9 +4,6 @@ import edu.eckerd.google.api.services.Service
 
 import language.implicitConversions
 
-/**
-  * Created by davenpcm on 5/5/16.
-  */
 case class Calendar(serviceAccountEmail: String,
                     impersonatedEmail: String,
                     credentialFilePath: String,

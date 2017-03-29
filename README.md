@@ -1,4 +1,4 @@
-Google-API-Scala [![Build Status](https://travis-ci.org/EckerdCollege/google-api-scala.svg?branch=0.1.x)](https://travis-ci.org/EckerdCollege/google-api-scala) [![codecov](https://codecov.io/gh/EckerdCollege/google-api-scala/branch/0.1.x/graph/badge.svg)](https://codecov.io/gh/EckerdCollege/google-api-scala) [![Stories in Ready](https://badge.waffle.io/EckerdCollege/google-api-scala.svg?label=ready&title=Ready)](http://waffle.io/EckerdCollege/google-api-scala)
+Google-API-Scala [![Build Status](https://travis-ci.org/EckerdCollege/google-api-scala.svg?branch=0.1.x)](https://travis-ci.org/EckerdCollege/google-api-scala) [![codecov](https://codecov.io/gh/EckerdCollege/google-api-scala/branch/0.1.x/graph/badge.svg)](https://codecov.io/gh/EckerdCollege/google-api-scala) 
 ================
 
 This API is a wrapper for the google java libraries. Currently mapping Admin Directory, Drive,

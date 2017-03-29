@@ -8,11 +8,7 @@ import edu.eckerd.google.api.services.drive.models.FileList._
 import language.implicitConversions
 import language.postfixOps
 import scala.annotation.tailrec
-import scala.util.Try
 
-/**
-  * Created by davenpcm on 5/4/16.
-  */
 class files(drive: Drive) {
 
   private val service = drive.asJava

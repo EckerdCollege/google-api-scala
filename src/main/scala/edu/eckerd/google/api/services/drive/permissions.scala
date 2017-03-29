@@ -1,15 +1,11 @@
 package edu.eckerd.google.api.services.drive
 
-
 import edu.eckerd.google.api.language.JavaConverters._
 
 import language.implicitConversions
 import language.postfixOps
 import models._
 
-/**
-  * Created by davenpcm on 5/4/16.
-  */
 class permissions(drive: Drive) {
   private val service = drive.asJava
 

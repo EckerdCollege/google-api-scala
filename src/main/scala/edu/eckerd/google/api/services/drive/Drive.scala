@@ -3,9 +3,6 @@ package edu.eckerd.google.api.services.drive
 import edu.eckerd.google.api.services.Service
 import language.implicitConversions
 
-/**
-  * Created by davenpcm on 5/5/16.
-  */
 case class Drive(serviceAccountEmail: String,
                  impersonatedEmail: String,
                  credentialFilePath: String,

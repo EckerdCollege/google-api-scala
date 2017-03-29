@@ -7,9 +7,6 @@ import models.Group
 import scala.annotation.tailrec
 import scala.util.Try
 
-/**
-  * Created by davenpcm on 5/3/16.
-  */
 class groups(directory: Directory) {
 
   private implicit val service = directory.asJava
