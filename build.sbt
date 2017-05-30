@@ -1,6 +1,6 @@
 name := "google-api-scala"
 organization := "edu.eckerd"
-version := "0.1.1-SNAPSHOT"
+version := "0.1.1"
 
 scalaVersion := "2.12.2"
 crossScalaVersions := Seq("2.11.11", scalaVersion.value)

@@ -20,7 +20,7 @@ it into 0.2.0 as well.
 
 In build.sbt
 ```sbt
-libraryDependencies += "edu.eckerd" %% "google-api-scala" % "0.1.0"
+libraryDependencies += "edu.eckerd" %% "google-api-scala" % "0.1.1"
 ```
 
 This is what a default configuration looks like that allows you to access each service with the least leg work. Now
