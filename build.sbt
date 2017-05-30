@@ -2,13 +2,13 @@ name := "google-api-scala"
 organization := "edu.eckerd"
 version := "0.1.1-SNAPSHOT"
 
-scalaVersion := "2.12.1"
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+scalaVersion := "2.12.2"
+crossScalaVersions := Seq("2.11.11", scalaVersion.value)
 
 libraryDependencies ++= List(
   "com.typesafe" % "config" % "1.3.1",
   "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-  "org.typelevel" %% "cats" % "0.8.1",
+  "org.typelevel" %% "cats" % "0.9.0",
   "com.google.api-client" % "google-api-client" % "1.22.0",
   "com.google.apis" % "google-api-services-admin-directory" % "directory_v1-rev67-1.22.0",
   "com.google.apis" % "google-api-services-calendar" % "v3-rev180-1.22.0",
